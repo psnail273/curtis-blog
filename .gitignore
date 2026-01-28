@@ -41,7 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 # ai
-.claude
 .cursor
 docs/features
 docs/bugs

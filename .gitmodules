@@ -1,0 +1,3 @@
+[submodule ".claude"]
+	path = .claude
+	url = git@git.stuffworks.net:psnail273/.claude.git
