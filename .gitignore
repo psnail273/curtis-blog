@@ -43,7 +43,6 @@ next-env.d.ts
 # ai
 .claude
 .cursor
-docs/features
-docs/bugs
+docs/
 CLAUDE.md
 .mcp.json
