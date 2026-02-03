@@ -1,5 +1,6 @@
 import { ArticleCard } from '@/components/articles/ArticleCard';
 import { mockArticles } from '@/lib/mock-articles';
+import styles from './page.module.scss';
 
 export default function Articles() {
   const articles = mockArticles;
@@ -7,14 +8,14 @@ export default function Articles() {
   return (
     <div>
       <h1>Articles</h1>
-      <p className="text-text-muted mb-8">
+      <p className={styles.description}>
         Browse all articles and posts.
       </p>
 
       {articles.length === 0 ? (
-        <p className="text-text-muted">No articles found.</p>
+        <p className={styles.emptyState}>No articles found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={styles.grid}>
           {articles.map((article) => (
             <ArticleCard key={article.id} article={article} />
           ))}

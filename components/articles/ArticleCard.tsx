@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Article } from '@/types/article';
+import styles from './ArticleCard.module.scss';
 
 interface ArticleCardProps {
   article: Article;
@@ -25,26 +26,26 @@ function formatDate(dateString: string): string {
 
 export function ArticleCard({ article }: ArticleCardProps) {
   return (
-    <Link href={`/articles/${article.slug}`} className="block h-full">
-      <Card className="h-full transition-all duration-200 hover:shadow-warm-lg hover:-translate-y-1 cursor-pointer border-border shadow-warm">
-        <CardHeader className="pb-2">
-          <div className="flex items-center gap-2 text-sm mb-2">
-            <span className="px-2 py-1 bg-accent/10 text-accent rounded-md text-xs font-medium">
+    <Link href={`/articles/${article.slug}`} className={styles.link}>
+      <Card className={`${styles.card} shadow-warm`}>
+        <CardHeader className={styles.header}>
+          <div className={styles.meta}>
+            <span className={styles.badge}>
               {article.category}
             </span>
-            <span className="text-text-muted">{article.readTime} min read</span>
+            <span className={styles.readTime}>{article.readTime} min read</span>
           </div>
-          <CardTitle className="line-clamp-2 text-lg leading-snug">
+          <CardTitle className={styles.title}>
             {article.title}
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-0">
-          <p className="text-text-muted line-clamp-3 text-sm">
+        <CardContent className={styles.content}>
+          <p className={styles.excerpt}>
             {article.excerpt}
           </p>
-          <div className="mt-4 text-sm text-text-muted">
+          <div className={styles.footer}>
             <span>{article.author}</span>
-            <span className="mx-2">·</span>
+            <span className={styles.separator}>·</span>
             <span>{formatDate(article.publishedAt)}</span>
           </div>
         </CardContent>

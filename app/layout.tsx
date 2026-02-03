@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
-import './globals.css';
+import './globals.scss';
 import Header from '@/components/header/header';
+import { LiveStatusProvider, StreamConfig } from '@/contexts/LiveStatusContext';
+import styles from './layout.module.scss';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,6 +26,26 @@ export const metadata: Metadata = {
   description: 'A personal blog by Curtis Israel covering politics, gaming, education, tech, and more.',
 };
 
+// Configure streams to monitor
+// Add or remove streams as needed
+const streams: StreamConfig[] = [];
+
+// Add Twitch stream if configured
+if (process.env.NEXT_PUBLIC_TWITCH_USERNAME) {
+  streams.push({
+    platform: 'twitch',
+    username: process.env.NEXT_PUBLIC_TWITCH_USERNAME,
+  });
+}
+
+// Add YouTube stream if configured
+if (process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID) {
+  streams.push({
+    platform: 'youtube',
+    username: process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID,
+  });
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,12 +54,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
+        style={{ WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale' }}
       >
-        <Header />
-        <main className="container mt-8">
-          {children}
-        </main>
+        <LiveStatusProvider streams={streams}>
+          <Header />
+          <main className={`container ${styles.main}`}>
+            {children}
+          </main>
+        </LiveStatusProvider>
       </body>
     </html>
   );
