@@ -1,0 +1,31 @@
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+
+  @media (min-width: 768px) {
+    padding: 1rem 2rem;
+  }
+
+  @media (min-width: 1280px) {
+    padding: 1rem clamp(2rem, 5vw, 4rem);
+  }
+}
+
+.logo {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 600;
+  font-family: var(--font-serif);
+  color: var(--foreground);
+  transition: color 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--accent);
+  }
+}

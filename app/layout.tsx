@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
-import './globals.css';
+import './globals.scss';
 import Header from '@/components/header/header';
+import { LiveStatusProvider } from '@/contexts/LiveStatusContext';
+import styles from './layout.module.scss';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -32,12 +34,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
+        style={{ WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale' }}
       >
-        <Header />
-        <main className="container mt-8">
-          {children}
-        </main>
+        <LiveStatusProvider>
+          <Header />
+          <main className={`container ${styles.main}`}>
+            {children}
+          </main>
+        </LiveStatusProvider>
       </body>
     </html>
   );

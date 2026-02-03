@@ -4,17 +4,20 @@ import nextTs from 'eslint-config-next/typescript';
 import stylistic from '@stylistic/eslint-plugin'
 
 const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
   {
     plugins: {
       '@stylistic': stylistic,
     },
     rules: {
-      '@stylistic/indent': ['error', 2], 
+      '@stylistic/indent': ['error', 2],
       '@stylistic/quotes': ['error', 'single'],
+      // Disable the set-state-in-effect rule as we have valid use cases
+      // (pathname changes and debounced query updates)
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
-  ...nextVitals,
-  ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

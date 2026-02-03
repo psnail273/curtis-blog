@@ -1,0 +1,10 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}

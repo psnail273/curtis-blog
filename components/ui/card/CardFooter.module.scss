@@ -1,0 +1,10 @@
+.cardFooter {
+  display: flex;
+  align-items: center;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+
+  &.borderTop {
+    padding-top: 1.5rem;
+  }
+}

@@ -1,14 +1,14 @@
 import Link from 'next/link';
+import SearchBox from '@/components/search/SearchBox';
+import styles from './topBar.module.scss';
 
 export default function TopBar() {
   return (
-    <div className="flex justify-between items-center w-full py-4 px-4 md:px-8">
-      <Link href="/" className="text-2xl font-semibold font-serif text-foreground hover:text-accent transition-colors duration-200 cursor-pointer">
+    <div className={styles.topBar}>
+      <Link href="/" className={styles.logo}>
         Curtis Israel
       </Link>
-      <div className="text-sm text-text-caption">
-        Search
-      </div>
+      <SearchBox />
     </div>
   );
 }
