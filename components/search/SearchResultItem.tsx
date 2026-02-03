@@ -1,14 +1,13 @@
 'use client';
 
 import { memo } from 'react';
-import Link from 'next/link';
 import { Article } from '@/types/article';
 import styles from './SearchResultItem.module.scss';
 
 interface SearchResultItemProps {
   article: Article;
   isSelected: boolean;
-  onClick: () => void;
+  onClick: (slug: string) => void;
 }
 
 function SearchResultItem({
@@ -21,12 +20,18 @@ function SearchResultItem({
     return null;
   }
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event from bubbling to backdrop
+    onClick(article.slug);
+  };
+
   return (
-    <Link
-      href={`/articles/${article.slug}`}
+    <div
       className={`${styles.result} ${isSelected ? styles.selected : ''}`}
-      onClick={onClick}
+      onClick={handleClick}
       aria-selected={isSelected}
+      role="option"
+      tabIndex={0}
     >
       <div className={styles.resultTitle}>{article.title || 'Untitled'}</div>
       <div className={styles.resultMeta}>
@@ -34,7 +39,7 @@ function SearchResultItem({
         <span className={styles.readTime}>{article.readTime || 0} min read</span>
       </div>
       {article.excerpt && <p className={styles.excerpt}>{article.excerpt}</p>}
-    </Link>
+    </div>
   );
 }
 

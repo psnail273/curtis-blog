@@ -2,63 +2,120 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-interface LiveStatusContextValue {
+export interface StreamConfig {
+  platform: 'twitch' | 'youtube';
+  username: string;
+}
+
+export interface StreamStatus {
   isLive: boolean;
   isLoading: boolean;
   error: string | null;
+  platform: string;
+  username: string;
+  metadata?: {
+    videoId?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface LiveStatusState {
+  [key: string]: StreamStatus;
+}
+
+interface LiveStatusContextValue {
+  status: LiveStatusState;
+  streams: StreamConfig[];
+  isAnyLive: boolean;
+  isLoading: boolean;
   refetch: () => Promise<void>;
 }
 
 const LiveStatusContext = createContext<LiveStatusContextValue | undefined>(undefined);
 
-const POLL_INTERVAL = 90 * 1000; // 90 seconds
+const POLL_INTERVAL = 60 * 1000; // 60 seconds
 
 interface LiveStatusProviderProps {
+  streams: StreamConfig[];
   children: ReactNode;
 }
 
-export function LiveStatusProvider({ children }: LiveStatusProviderProps) {
-  const [isLive, setIsLive] = useState(false);
+export function LiveStatusProvider({ streams, children }: LiveStatusProviderProps) {
+  const [status, setStatus] = useState<LiveStatusState>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchLiveStatus = async () => {
+  const fetchStreamStatus = async (stream: StreamConfig) => {
+    const key = `${stream.platform}:${stream.username}`;
+
     try {
-      setError(null);
-      const response = await fetch('/api/live-status');
+      const response = await fetch(
+        `/api/live-status/${stream.platform}/${stream.username}`
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
 
       const data = await response.json();
-      setIsLive(data.isLive || false);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.warn('Failed to fetch live status:', errorMessage);
-      setError(errorMessage);
-      setIsLive(false); // Fail safely to offline
-    } finally {
-      setIsLoading(false);
+
+      setStatus(prev => ({
+        ...prev,
+        [key]: {
+          isLive: data.isLive || false,
+          isLoading: false,
+          error: data.error || null,
+          platform: stream.platform,
+          username: stream.username,
+          metadata: data.metadata,
+        },
+      }));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.warn(`Failed to fetch live status for ${key}:`, errorMessage);
+
+      setStatus(prev => ({
+        ...prev,
+        [key]: {
+          isLive: false,
+          isLoading: false,
+          error: errorMessage,
+          platform: stream.platform,
+          username: stream.username,
+        },
+      }));
     }
   };
 
+  const fetchAllStreams = async () => {
+    // Fetch all streams in parallel
+    await Promise.all(streams.map(fetchStreamStatus));
+    setIsLoading(false);
+  };
+
   useEffect(() => {
+    if (streams.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
     // Initial fetch
-    fetchLiveStatus();
+    fetchAllStreams();
 
     // Set up polling interval
-    const intervalId = setInterval(fetchLiveStatus, POLL_INTERVAL);
+    const intervalId = setInterval(fetchAllStreams, POLL_INTERVAL);
 
     // Cleanup on unmount
     return () => clearInterval(intervalId);
-  }, []);
+  }, [streams]);
+
+  const isAnyLive = Object.values(status).some(s => s.isLive);
 
   const value: LiveStatusContextValue = {
-    isLive,
+    status,
+    streams,
+    isAnyLive,
     isLoading,
-    error,
-    refetch: fetchLiveStatus,
+    refetch: fetchAllStreams,
   };
 
   return (

@@ -1,15 +1,13 @@
 .dropdown {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 0;
-  right: 0;
+  position: fixed;
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   box-shadow: 0 8px 24px rgba(44, 36, 24, 0.12);
   max-height: 400px;
   overflow-y: auto;
-  z-index: 50;
+  z-index: 1001;
+  pointer-events: auto;
 
   @media (prefers-color-scheme: dark) {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
