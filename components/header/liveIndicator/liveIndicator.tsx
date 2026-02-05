@@ -39,13 +39,9 @@ function getStreamUrl(
 }
 
 export default function LiveIndicator({ status, streams }: LiveIndicatorProps) {
-  // Don't show anything if no streams are configured
   if (streams.length === 0) {
     return null;
   }
-
-  // Determine if any stream is live
-  const hasLiveStream = Object.values(status).some(s => s.isLive);
 
   const handleStreamClick = (url: string) => {
     if (url) {
@@ -55,14 +51,6 @@ export default function LiveIndicator({ status, streams }: LiveIndicatorProps) {
 
   return (
     <div className={styles.liveIndicator}>
-      {/* Show LIVE indicator only if at least one stream is live */}
-      {hasLiveStream && (
-        <>
-          <span className={styles.liveDot}></span>
-          <span className={styles.liveText}>LIVE</span>
-        </>
-      )}
-
       <div className={styles.platforms}>
         {streams.map(stream => {
           const key = `${stream.platform}:${stream.username}`;
