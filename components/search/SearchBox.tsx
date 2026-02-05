@@ -8,7 +8,6 @@ import SearchDropdown from './SearchDropdown';
 import Backdrop from './Backdrop';
 import { SearchIcon } from './SearchIcon';
 import { useDebounce } from '@/hooks/useDebounce';
-import styles from './SearchBox.module.scss';
 
 export default function SearchBox() {
   const [query, setQuery] = useState('');
@@ -99,7 +98,7 @@ export default function SearchBox() {
       const target = event.target as Node;
       const isClickInSearchBox = searchRef.current?.contains(target);
       const isClickInDropdown = dropdownRef.current?.contains(target);
-      
+
       if (!isClickInSearchBox && !isClickInDropdown) {
         setIsOpen(false);
         setSelectedIndex(-1);
@@ -150,8 +149,8 @@ export default function SearchBox() {
 
   return (
     <>
-      <div ref={searchRef} className={styles.searchBox}>
-        <div className={styles.inputWrapper}>
+      <div ref={searchRef} className="relative w-full max-w-[300px] sm:max-w-[400px]">
+        <div className="search-input-wrapper flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg transition-all duration-200 text-muted">
           <SearchIcon />
           <input
             type="text"
@@ -159,7 +158,7 @@ export default function SearchBox() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className={styles.input}
+            className="flex-1 border-none outline-none bg-transparent text-body text-sm font-sans min-w-0 placeholder:text-caption"
             aria-label="Search articles"
           />
         </div>

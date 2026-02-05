@@ -3,7 +3,6 @@
 import { forwardRef } from 'react';
 import { Article } from '@/types/article';
 import SearchResultItem from './SearchResultItem';
-import styles from './SearchDropdown.module.scss';
 
 interface SearchDropdownProps {
   results: Article[];
@@ -33,12 +32,12 @@ const SearchDropdownComponent = forwardRef<HTMLDivElement, SearchDropdownProps>(
   return (
     <div
       ref={ref}
-      className={styles.dropdown}
+      className="fixed bg-card border border-border rounded-lg shadow-warm-lg max-h-[400px] overflow-y-auto z-[1001] pointer-events-auto"
       style={dropdownStyle}
       onClick={handleDropdownClick}
     >
       {results.length === 0 ? (
-        <div className={styles.noResults}>
+        <div className="py-6 px-4 text-center text-muted text-sm">
           No articles found for &quot;{query}&quot;
         </div>
       ) : (

@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { mockArticles } from '@/lib/mock-articles';
-import styles from './page.module.scss';
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -29,7 +28,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <article>
-      <Link href="/articles" className={styles.backLink}>
+      <Link
+        href="/articles"
+        className="inline-flex items-center gap-2 text-muted mb-6 text-sm hover:text-accent"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -47,18 +49,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         Back to articles
       </Link>
 
-      <header className={styles.header}>
-        <div className={styles.meta}>
-          <span className={styles.badge}>
+      <header className="mb-8">
+        <div className="flex items-center gap-3 text-sm text-muted mb-4">
+          <span className="px-2 py-1 bg-[var(--accent-bg)] text-accent rounded-md text-xs font-medium">
             {article.category}
           </span>
           <span>{article.readTime} min read</span>
         </div>
 
-        <h1 className={styles.title}>{article.title}</h1>
+        <h1 className="mb-4">{article.title}</h1>
 
-        <div className={styles.authorInfo}>
-          <span className={styles.authorName}>{article.author}</span>
+        <div className="flex items-center gap-2 text-muted">
+          <span className="font-medium text-foreground">{article.author}</span>
           <span>·</span>
           <time dateTime={article.publishedAt}>
             {formatDate(article.publishedAt)}
@@ -66,9 +68,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </div>
       </header>
 
-      <div className={styles.content}>
+      <div className="max-w-none">
         {article.content.split('\n\n').map((paragraph, index) => (
-          <p key={index} className={styles.paragraph}>
+          <p key={index} className="mb-4 text-body leading-7">
             {paragraph}
           </p>
         ))}

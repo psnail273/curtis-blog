@@ -1,7 +1,5 @@
 'use client';
 
-import styles from './Backdrop.module.scss';
-
 interface BackdropProps {
   isVisible: boolean;
   onClick: () => void;
@@ -16,7 +14,7 @@ export default function Backdrop({ isVisible, onClick }: BackdropProps) {
 
   return (
     <div
-      className={styles.backdrop}
+      className="fixed inset-0 bg-black/50 dark:bg-black/70 z-[900] pointer-events-auto"
       onClick={handleClick}
       aria-hidden="true"
     />
