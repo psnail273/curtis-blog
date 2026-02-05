@@ -1,0 +1,427 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   Light Mode CSS Custom Properties
+   ========================================================================= */
+
+:root {
+  /* Base colors - Light mode (Mid-Century Modern Warm) */
+  --background: #FAF7F2;
+  --foreground: #2C2418;
+  --secondary: #5C5347;
+  --border: #E5DDD0;
+
+  /* Accent colors - Terracotta & Gold */
+  --accent: #C45C3E;
+  --accent-hover: #A84830;
+  --accent-secondary: #D4A84B;
+
+  /* Typography */
+  --text-body: #3D352A;
+  --text-muted: #8B7355;
+  --text-caption: #A89880;
+
+  /* shadcn variables */
+  --radius: 0.625rem;
+  --card: #FAF7F2;
+  --card-foreground: #2C2418;
+  --popover: #FAF7F2;
+  --popover-foreground: #2C2418;
+  --primary: #2C2418;
+  --primary-foreground: #FAF7F2;
+  --secondary-foreground: #2C2418;
+  --muted: #E5DDD0;
+  --muted-foreground: #8B7355;
+  --accent-foreground: #FAF7F2;
+  --destructive: oklch(0.577 0.245 27.325);
+  --input: #E5DDD0;
+  --ring: #C45C3E;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: #FAF7F2;
+  --sidebar-foreground: #2C2418;
+  --sidebar-primary: #2C2418;
+  --sidebar-primary-foreground: #FAF7F2;
+  --sidebar-accent: #E5DDD0;
+  --sidebar-accent-foreground: #2C2418;
+  --sidebar-border: #E5DDD0;
+  --sidebar-ring: #C45C3E;
+
+  /* Badge backgrounds (10% opacity accent) */
+  --accent-bg: rgba(196, 92, 62, 0.1);
+
+  /* Dark shadow overrides (for component use) */
+  --shadow-warm-dark: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-warm-lg-dark: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* =========================================================================
+   Dark Mode CSS Custom Properties
+   ========================================================================= */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Badge backgrounds (10% opacity accent) */
+    --accent-bg: rgba(224, 122, 95, 0.1);
+
+    /* Base colors - Dark mode (Warm Charcoal) */
+    --background: #1A1612;
+    --foreground: #F5F0E8;
+    --secondary: #A89880;
+    --border: #3D3428;
+
+    /* Accent colors - Brighter for dark mode */
+    --accent: #E07A5F;
+    --accent-hover: #C45C3E;
+    --accent-secondary: #E8B84A;
+
+    /* Typography */
+    --text-body: #E8E0D5;
+    --text-muted: #A89880;
+    --text-caption: #7A6F60;
+
+    /* shadcn variables */
+    --card: #2A2520;
+    --card-foreground: #F5F0E8;
+    --popover: #2A2520;
+    --popover-foreground: #F5F0E8;
+    --primary: #F5F0E8;
+    --primary-foreground: #1A1612;
+    --secondary-foreground: #F5F0E8;
+    --muted: #3D3428;
+    --muted-foreground: #A89880;
+    --accent-foreground: #1A1612;
+    --destructive: oklch(0.704 0.191 22.216);
+    --input: #3D3428;
+    --ring: #E07A5F;
+    --sidebar: #1A1612;
+    --sidebar-foreground: #F5F0E8;
+    --sidebar-primary: #F5F0E8;
+    --sidebar-primary-foreground: #1A1612;
+    --sidebar-accent: #3D3428;
+    --sidebar-accent-foreground: #F5F0E8;
+    --sidebar-border: #3D3428;
+    --sidebar-ring: #E07A5F;
+  }
+}
+
+/* =========================================================================
+   Tailwind Theme Tokens
+   ========================================================================= */
+
+@theme inline {
+  /* Core palette
+     Usage: bg-background, text-foreground, border-border, etc. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-secondary: var(--secondary);
+  --color-border: var(--border);
+
+  /* Accent colors
+     Usage: bg-accent, text-accent, text-accent-hover, bg-accent-secondary */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-secondary: var(--accent-secondary);
+
+  /* Typography colors
+     Usage: text-body, text-muted, text-caption */
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-caption: var(--text-caption);
+
+  /* shadcn component colors
+     Usage: bg-card, text-card-foreground, bg-popover, etc. */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Sidebar colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Chart colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Border radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Font families
+     Usage: font-sans, font-serif */
+  --font-sans: var(--font-inter), sans-serif;
+  --font-serif: var(--font-source-serif), Georgia, serif;
+
+  /* Custom shadows -- warm analog feel
+     Light mode: shadow-warm, shadow-warm-lg
+     Usage pattern in HTML: class="shadow-warm dark:[box-shadow:var(--shadow-warm-dark)]" */
+  --shadow-warm: 0 4px 12px rgba(44, 36, 24, 0.08);
+  --shadow-warm-lg: 0 8px 24px rgba(44, 36, 24, 0.12);
+}
+
+/* ===========================
+   Base Typography & Elements
+   =========================== */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    line-height: 1.625;
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 1.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    margin-bottom: 0.875rem;
+  }
+
+  h3 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--foreground);
+    margin-bottom: 0.75rem;
+  }
+
+  h4 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--foreground);
+    margin-bottom: 0.625rem;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--accent-hover);
+  }
+}
+
+/* ===========================
+   Focus Ring Styles
+   =========================== */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===========================
+   Component Classes
+   =========================== */
+@layer components {
+  .nav-link {
+    position: relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-accent);
+    transition: width 0.3s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  /* Search component styles that require pseudo-class selectors or
+     relative color syntax not expressible with Tailwind utilities */
+
+  .search-input-wrapper:focus-within {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 10%, transparent);
+  }
+
+  .search-input-wrapper:focus-within svg {
+    color: var(--accent);
+  }
+
+  .search-result:hover {
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
+
+  .search-result-selected {
+    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+
+  .search-category-badge {
+    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+
+  /* Hamburger button line positioning and open-state animation */
+  .hamburger-line {
+    position: absolute;
+  }
+
+  .hamburger-line:nth-child(1) {
+    top: 14px;
+  }
+
+  .hamburger-line:nth-child(2) {
+    top: 21px;
+  }
+
+  .hamburger-line:nth-child(3) {
+    top: 28px;
+  }
+
+  .hamburger-open .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .hamburger-open .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger-open .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
+
+/* ===========================
+   Utilities
+   =========================== */
+@layer utilities {
+  .shadow-warm-hover {
+    box-shadow: 0 8px 24px rgba(44, 36, 24, 0.12);
+
+    @media (prefers-color-scheme: dark) {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+}
+
+/* =============================================
+   Micro-interaction Animations
+   ============================================= */
+
+/* Live pulse glow -- a subtle red/accent glow that pulses on live streaming cards */
+@keyframes live-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.15);
+  }
+}
+
+/* Live dot pulse -- for the small "LIVE" badge dot indicator */
+@keyframes live-dot-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+/* Fade-in-up entrance -- for sections that fade in on page load */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility classes for animations */
+.animate-live-pulse {
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+.animate-live-dot-pulse {
+  animation: live-dot-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+/* Staggered entrance delays for child elements */
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-live-pulse,
+  .animate-live-dot-pulse,
+  .animate-fade-in-up {
+    animation: none;
+  }
+
+  .animate-fade-in-up {
+    opacity: 1;
+    transform: none;
+  }
+}

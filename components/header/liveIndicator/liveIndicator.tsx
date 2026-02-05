@@ -1,82 +1,55 @@
 'use client';
 
-import { Twitch, Youtube } from 'lucide-react';
-import styles from './liveIndicator.module.scss';
-import { LiveStatusState, StreamConfig } from '@/contexts/LiveStatusContext';
+import { cn } from '@/lib/utils';
 
 interface LiveIndicatorProps {
-  status: LiveStatusState;
-  streams: StreamConfig[];
+  isAnyLive: boolean;
+  isLoading: boolean;
 }
 
-/**
- * Generate the URL for a stream based on platform, username, and status
- * For YouTube: If live and videoId is available, link to the video. Otherwise, link to the channel.
- * For Twitch: Always link to the channel page.
- */
-function getStreamUrl(
-  platform: 'twitch' | 'youtube',
-  username: string,
-  streamStatus?: { isLive: boolean; metadata?: { videoId?: string } }
-): string {
-  if (!username) {
-    return '';
-  }
-
-  switch (platform) {
-    case 'twitch':
-      return `https://twitch.tv/${username}`;
-    case 'youtube':
-      // If live and we have a videoId, link directly to the video
-      if (streamStatus?.isLive && streamStatus.metadata?.videoId) {
-        return `https://youtube.com/watch?v=${streamStatus.metadata.videoId}`;
-      }
-      // Otherwise link to the channel page (username is actually a channel ID)
-      return `https://youtube.com/channel/${username}`;
-    default:
-      return '';
-  }
-}
-
-export default function LiveIndicator({ status, streams }: LiveIndicatorProps) {
-  if (streams.length === 0) {
+export default function LiveIndicator({ isAnyLive, isLoading }: LiveIndicatorProps) {
+  // Don't render during loading to avoid flash of incorrect state
+  if (isLoading) {
     return null;
   }
 
-  const handleStreamClick = (url: string) => {
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  };
+  // When offline, hide the indicator entirely -- the home page
+  // StreamingStatus component handles the offline/follow display
+  if (!isAnyLive) {
+    return null;
+  }
 
   return (
-    <div className={styles.liveIndicator}>
-      <div className={styles.platforms}>
-        {streams.map(stream => {
-          const key = `${stream.platform}:${stream.username}`;
-          const streamStatus = status[key];
-          const isOffline = !streamStatus?.isLive || streamStatus?.error !== null || streamStatus?.isLoading;
-          const streamUrl = getStreamUrl(stream.platform, stream.username, streamStatus);
-          const platformLabel = stream.platform === 'twitch' ? 'Twitch' : 'YouTube';
+    <div
+      className={cn(
+        'flex items-center gap-1.5 px-2 py-1 rounded-full',
+        'bg-accent/10 border border-accent/20',
+        'transition-opacity duration-300'
+      )}
+      role="status"
+      aria-live="polite"
+      aria-label="A live stream is currently active"
+    >
+      {/* Pulsing dot indicator */}
+      <span className="relative flex h-2 w-2" aria-hidden="true">
+        <span
+          className={cn(
+            'absolute inline-flex h-full w-full rounded-full bg-accent opacity-75',
+            'animate-ping motion-reduce:animate-none'
+          )}
+        />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+      </span>
 
-          return (
-            <button
-              key={key}
-              className={`${styles.platformButton} ${isOffline ? styles.offline : ''}`}
-              onClick={() => handleStreamClick(streamUrl)}
-              aria-label={`Open ${platformLabel} stream for ${stream.username}`}
-              title={`${platformLabel}: ${stream.username}`}
-              disabled={!streamUrl}
-            >
-              {stream.platform === 'twitch' ? (
-                <Twitch size={16} aria-hidden="true" />
-              ) : (
-                <Youtube size={16} aria-hidden="true" />
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {/* LIVE text */}
+      <span
+        className={cn(
+          'text-[0.625rem] font-semibold uppercase tracking-[0.1em] leading-none',
+          'text-accent select-none'
+        )}
+      >
+        LIVE
+      </span>
     </div>
   );
 }

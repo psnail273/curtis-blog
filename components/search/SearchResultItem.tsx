@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 import { Article } from '@/types/article';
-import styles from './SearchResultItem.module.scss';
+import { cn } from '@/lib/utils';
 
 interface SearchResultItemProps {
   article: Article;
@@ -27,18 +27,29 @@ function SearchResultItem({
 
   return (
     <div
-      className={`${styles.result} ${isSelected ? styles.selected : ''}`}
+      className={cn(
+        'search-result block px-4 py-3 border-b border-border transition-colors duration-200 cursor-pointer min-h-[44px] last:border-b-0 focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
+        isSelected && 'search-result-selected'
+      )}
       onClick={handleClick}
       aria-selected={isSelected}
       role="option"
       tabIndex={0}
     >
-      <div className={styles.resultTitle}>{article.title || 'Untitled'}</div>
-      <div className={styles.resultMeta}>
-        <span className={styles.category}>{article.category || 'Uncategorized'}</span>
-        <span className={styles.readTime}>{article.readTime || 0} min read</span>
+      <div className="text-[0.9375rem] font-medium text-foreground line-clamp-2 leading-[1.4] mb-1.5">
+        {article.title || 'Untitled'}
       </div>
-      {article.excerpt && <p className={styles.excerpt}>{article.excerpt}</p>}
+      <div className="flex items-center gap-2 text-xs mb-1.5">
+        <span className="search-category-badge px-1.5 py-0.5 text-accent rounded font-medium">
+          {article.category || 'Uncategorized'}
+        </span>
+        <span className="text-muted">{article.readTime || 0} min read</span>
+      </div>
+      {article.excerpt && (
+        <p className="text-[0.8125rem] text-muted line-clamp-2 leading-normal m-0">
+          {article.excerpt}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,24 +1,19 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
-import './globals.scss';
+import { Inter, Source_Serif_4 } from 'next/font/google';
+import './globals.css';
 import Header from '@/components/header/header';
 import { LiveStatusProvider, StreamConfig } from '@/contexts/LiveStatusContext';
-import styles from './layout.module.scss';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const sourceSerif = Source_Serif_4({
+  variable: '--font-source-serif',
   subsets: ['latin'],
-});
-
-const playfair = Playfair_Display({
-  variable: '--font-playfair',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -53,13 +48,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
-        style={{ WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale' }}
-      >
+      <body className={`${inter.variable} ${sourceSerif.variable} antialiased`}>
         <LiveStatusProvider streams={streams}>
           <Header />
-          <main className={`container ${styles.main}`}>
+          <main className="mx-auto max-w-4xl px-4 md:px-8 mt-8">
             {children}
           </main>
         </LiveStatusProvider>
