@@ -19,10 +19,11 @@ const SearchDropdownComponent = forwardRef<HTMLDivElement, SearchDropdownProps>(
   onClose,
   position,
 }, ref) => {
-  const dropdownStyle = {
+  const dropdownStyle: React.CSSProperties = {
     top: `${position.top}px`,
     left: `${position.left}px`,
     width: `${position.width}px`,
+    maxWidth: 'calc(100vw - 16px)',
   };
 
   const handleDropdownClick = (e: React.MouseEvent) => {
@@ -35,6 +36,8 @@ const SearchDropdownComponent = forwardRef<HTMLDivElement, SearchDropdownProps>(
       className="fixed bg-card border border-border rounded-lg shadow-warm-lg max-h-[400px] overflow-y-auto z-[1001] pointer-events-auto"
       style={dropdownStyle}
       onClick={handleDropdownClick}
+      role="listbox"
+      aria-label="Search results"
     >
       {results.length === 0 ? (
         <div className="py-6 px-4 text-center text-muted text-sm">

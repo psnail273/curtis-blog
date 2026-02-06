@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 export interface StreamConfig {
   platform: 'twitch' | 'youtube';
@@ -44,7 +44,7 @@ export function LiveStatusProvider({ streams, children }: LiveStatusProviderProp
   const [status, setStatus] = useState<LiveStatusState>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchStreamStatus = async (stream: StreamConfig) => {
+  const fetchStreamStatus = useCallback(async (stream: StreamConfig) => {
     const key = `${stream.platform}:${stream.username}`;
 
     try {
@@ -84,13 +84,13 @@ export function LiveStatusProvider({ streams, children }: LiveStatusProviderProp
         },
       }));
     }
-  };
+  }, []);
 
-  const fetchAllStreams = async () => {
+  const fetchAllStreams = useCallback(async () => {
     // Fetch all streams in parallel
     await Promise.all(streams.map(fetchStreamStatus));
     setIsLoading(false);
-  };
+  }, [streams, fetchStreamStatus]);
 
   useEffect(() => {
     if (streams.length === 0) {
@@ -106,7 +106,7 @@ export function LiveStatusProvider({ streams, children }: LiveStatusProviderProp
 
     // Cleanup on unmount
     return () => clearInterval(intervalId);
-  }, [streams]);
+  }, [streams, fetchAllStreams]);
 
   const isAnyLive = Object.values(status).some(s => s.isLive);
 

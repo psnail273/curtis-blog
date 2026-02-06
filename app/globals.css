@@ -12,14 +12,14 @@
   --border: #E5DDD0;
 
   /* Accent colors - Terracotta & Gold */
-  --accent: #C45C3E;
+  --accent: #B5522F;
   --accent-hover: #A84830;
   --accent-secondary: #D4A84B;
 
   /* Typography */
   --text-body: #3D352A;
-  --text-muted: #8B7355;
-  --text-caption: #A89880;
+  --text-muted: #766040;
+  --text-caption: #7F6648;
 
   /* shadcn variables */
   --radius: 0.625rem;
@@ -31,11 +31,11 @@
   --primary-foreground: #FAF7F2;
   --secondary-foreground: #2C2418;
   --muted: #E5DDD0;
-  --muted-foreground: #8B7355;
+  --muted-foreground: #766040;
   --accent-foreground: #FAF7F2;
   --destructive: oklch(0.577 0.245 27.325);
   --input: #E5DDD0;
-  --ring: #C45C3E;
+  --ring: #B5522F;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -48,10 +48,7 @@
   --sidebar-accent: #E5DDD0;
   --sidebar-accent-foreground: #2C2418;
   --sidebar-border: #E5DDD0;
-  --sidebar-ring: #C45C3E;
-
-  /* Badge backgrounds (10% opacity accent) */
-  --accent-bg: rgba(196, 92, 62, 0.1);
+  --sidebar-ring: #B5522F;
 
   /* Dark shadow overrides (for component use) */
   --shadow-warm-dark: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -64,9 +61,6 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Badge backgrounds (10% opacity accent) */
-    --accent-bg: rgba(224, 122, 95, 0.1);
-
     /* Base colors - Dark mode (Warm Charcoal) */
     --background: #1A1612;
     --foreground: #F5F0E8;
@@ -75,13 +69,13 @@
 
     /* Accent colors - Brighter for dark mode */
     --accent: #E07A5F;
-    --accent-hover: #C45C3E;
+    --accent-hover: #B5522F;
     --accent-secondary: #E8B84A;
 
     /* Typography */
     --text-body: #E8E0D5;
     --text-muted: #A89880;
-    --text-caption: #7A6F60;
+    --text-caption: #9A8E7E;
 
     /* shadcn variables */
     --card: #2A2520;
@@ -195,11 +189,12 @@
     color: var(--text-body);
     font-family: var(--font-sans);
     line-height: 1.625;
+    overflow-x: hidden;
   }
 
   h1 {
     font-family: var(--font-serif);
-    font-size: 2.5rem;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
     font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.02em;
@@ -209,7 +204,7 @@
 
   h2 {
     font-family: var(--font-serif);
-    font-size: 1.875rem;
+    font-size: clamp(1.5rem, 4vw, 1.875rem);
     font-weight: 600;
     line-height: 1.25;
     letter-spacing: -0.01em;
@@ -219,7 +214,7 @@
 
   h3 {
     font-family: var(--font-serif);
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 3.5vw, 1.5rem);
     font-weight: 500;
     line-height: 1.35;
     color: var(--foreground);
@@ -228,7 +223,7 @@
 
   h4 {
     font-family: var(--font-serif);
-    font-size: 1.25rem;
+    font-size: clamp(1.125rem, 3vw, 1.25rem);
     font-weight: 500;
     line-height: 1.4;
     color: var(--foreground);
@@ -339,6 +334,24 @@
    Utilities
    =========================== */
 @layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .font-terminal {
+    font-family: 'Courier New', Courier, monospace;
+    font-variant-ligatures: none;
+    letter-spacing: -0.02em;
+  }
+
   .shadow-warm-hover {
     box-shadow: 0 8px 24px rgba(44, 36, 24, 0.12);
 
@@ -412,6 +425,18 @@
   animation-delay: 300ms;
 }
 
+/* Backdrop filter fallback for older Safari versions:
+   Use higher opacity when backdrop-filter is not supported */
+.mobile-nav-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) {
+  .mobile-nav-backdrop {
+    background-color: transparent;
+  }
+}
+
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .animate-live-pulse,
@@ -423,5 +448,9 @@
   .animate-fade-in-up {
     opacity: 1;
     transform: none;
+  }
+
+  .nav-link::after {
+    transition: none;
   }
 }

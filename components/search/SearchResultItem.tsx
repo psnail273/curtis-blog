@@ -16,7 +16,6 @@ function SearchResultItem({
   onClick,
 }: SearchResultItemProps) {
   if (!article || !article.slug) {
-    console.warn('SearchResultItem: Invalid article data', article);
     return null;
   }
 

@@ -2,15 +2,26 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About | Curtis Israel',
+  title: 'About',
   description: 'Learn more about Curtis Israel - writer, streamer, and thinker on politics, gaming, education, and tech.',
+  openGraph: {
+    title: 'About | Curtis Israel',
+    description: 'Learn more about Curtis Israel - writer, streamer, and thinker on politics, gaming, education, and tech.',
+    url: '/about',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'About | Curtis Israel',
+    description: 'Learn more about Curtis Israel - writer, streamer, and thinker on politics, gaming, education, and tech.',
+  },
 };
 
 export default function About() {
   return (
-    <div>
+    <div className="space-y-16">
       {/* Header section */}
-      <section className="pb-12 md:pb-16">
+      <section>
         {/* Decorative accent line */}
         <div className="w-12 h-1 rounded-full mb-8 bg-accent" />
 
@@ -24,7 +35,7 @@ export default function About() {
       </section>
 
       {/* Biography Content */}
-      <section className="max-w-3xl space-y-10">
+      <section className="max-w-3xl space-y-12">
         {/* Opening - who Curtis is */}
         <div className="space-y-4">
           <p className="text-lg leading-relaxed text-body">
@@ -58,8 +69,8 @@ export default function About() {
       </section>
 
       {/* Topics Section */}
-      <section className="pt-12 pb-8">
-        <h2>What I Write About</h2>
+      <section>
+        <h2 className="mb-6">What I Write About</h2>
         <div className="flex flex-wrap gap-3">
           {['Politics', 'Gaming', 'Education', 'Tech', '& More'].map(
             (topic) => (
@@ -75,8 +86,8 @@ export default function About() {
       </section>
 
       {/* CTA Section */}
-      <section className="pt-8 pb-12">
-        <div className="border-t border-border pt-8">
+      <section>
+        <div className="border-t border-border pt-12">
           <p className="text-body text-lg leading-relaxed">
             Curious?{' '}
             <Link href="/articles">

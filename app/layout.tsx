@@ -17,8 +17,29 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: 'Curtis Israel',
+  title: {
+    default: 'Curtis Israel',
+    template: '%s | Curtis Israel',
+  },
   description: 'A personal blog by Curtis Israel covering politics, gaming, education, tech, and more.',
+  metadataBase: new URL('https://curtisisrael.com'),
+  openGraph: {
+    title: 'Curtis Israel',
+    description: 'A personal blog by Curtis Israel covering politics, gaming, education, tech, and more.',
+    url: 'https://curtisisrael.com',
+    siteName: 'Curtis Israel',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Curtis Israel',
+    description: 'A personal blog by Curtis Israel covering politics, gaming, education, tech, and more.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 // Configure streams to monitor
@@ -49,9 +70,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${sourceSerif.variable} antialiased`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-lg focus:outline-2 focus:outline-ring focus:outline-offset-2"
+        >
+          Skip to main content
+        </a>
         <LiveStatusProvider streams={streams}>
           <Header />
-          <main className="mx-auto max-w-4xl px-4 md:px-8 mt-8">
+          <main id="main-content" className="mx-auto max-w-4xl px-4 md:px-8 mt-8">
             {children}
           </main>
         </LiveStatusProvider>

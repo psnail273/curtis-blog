@@ -13,7 +13,7 @@ export default function StreamingStatus() {
   }
 
   return (
-    <section aria-label="Streaming status" className="animate-fade-in-up">
+    <section id="streaming-status" aria-label="Streaming status" className="animate-fade-in-up">
       {/* Section heading */}
       <h2 className="mb-6">
         {isLoading

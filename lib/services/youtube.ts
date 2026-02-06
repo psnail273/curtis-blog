@@ -23,7 +23,7 @@ export async function checkStreamStatus(channelId: string): Promise<YouTubeStrea
     }
 
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?` +
+      'https://www.googleapis.com/youtube/v3/search?' +
       `part=snippet&channelId=${encodeURIComponent(channelId)}&eventType=live&type=video` +
       `&key=${apiKey}`
     );

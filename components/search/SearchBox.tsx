@@ -68,7 +68,6 @@ export default function SearchBox() {
 
         const filtered = mockArticles.filter((article) => {
           if (!article.title || !article.category || !article.slug) {
-            console.warn('Article missing required fields:', article.id);
             return false;
           }
 
@@ -149,8 +148,8 @@ export default function SearchBox() {
 
   return (
     <>
-      <div ref={searchRef} className="relative w-full max-w-[300px] sm:max-w-[400px]">
-        <div className="search-input-wrapper flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg transition-all duration-200 text-muted">
+      <div ref={searchRef} className="relative w-full max-w-full sm:max-w-[400px]">
+        <div className="search-input-wrapper flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg transition-all duration-200 text-muted min-h-[44px]">
           <SearchIcon />
           <input
             type="text"
@@ -158,7 +157,7 @@ export default function SearchBox() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 border-none outline-none bg-transparent text-body text-sm font-sans min-w-0 placeholder:text-caption"
+            className="flex-1 border-none outline-none bg-transparent text-body text-base font-sans min-w-0 placeholder:text-caption"
             aria-label="Search articles"
           />
         </div>

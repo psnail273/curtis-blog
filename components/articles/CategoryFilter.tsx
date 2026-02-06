@@ -14,13 +14,13 @@ export function CategoryFilter({
   onSelect,
 }: CategoryFilterProps) {
   return (
-    <div role="group" aria-label="Filter articles by category" className="flex flex-wrap gap-2">
+    <div role="group" aria-label="Filter articles by category" className="flex flex-wrap gap-3">
       {/* "All" pill -- always first */}
       <button
         type="button"
         onClick={() => onSelect(null)}
         className={cn(
-          'px-4 py-1.5 rounded-full text-sm font-medium',
+          'px-4 py-2.5 rounded-full text-sm font-medium min-h-[44px] flex items-center justify-center',
           'transition-colors duration-200',
           'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
           selectedCategory === null
@@ -39,7 +39,7 @@ export function CategoryFilter({
           type="button"
           onClick={() => onSelect(category)}
           className={cn(
-            'px-4 py-1.5 rounded-full text-sm font-medium',
+            'px-4 py-2.5 rounded-full text-sm font-medium min-h-[44px] flex items-center justify-center',
             'transition-colors duration-200',
             'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
             selectedCategory === category

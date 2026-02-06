@@ -1,0 +1,87 @@
+/* Terminal window background - slightly darker/lighter than page */
+.terminal-window {
+  background-color: #F5F0E8; /* Light mode: darker warm cream */
+  box-shadow: 0 4px 12px rgba(44, 36, 24, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .terminal-window {
+    background-color: #201C18; /* Dark mode: slightly lighter warm charcoal */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.terminal-title-bar {
+  background-color: #EFE9DD; /* Light mode: slightly darker than terminal bg */
+}
+
+@media (prefers-color-scheme: dark) {
+  .terminal-title-bar {
+    background-color: #2A2520; /* Dark mode: slightly lighter than terminal bg */
+  }
+}
+
+/* Blinking cursor animation */
+@keyframes blink-cursor {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor {
+  animation: blink-cursor 1s step-end infinite;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .terminal-cursor {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Line-by-line reveal animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.terminal-output-line {
+  animation: fade-in 0.15s ease-out forwards;
+  will-change: opacity, transform;
+}
+
+/* Respect reduced motion preference for output lines */
+@media (prefers-reduced-motion: reduce) {
+  .terminal-output-line {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}
+
+/* Terminal input field */
+.terminal-input {
+  caret-color: var(--accent); /* Amber/terracotta caret */
+}
+
+.terminal-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* If we want a more subtle terminal-style focus indicator */
+.terminal-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
