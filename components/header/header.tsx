@@ -64,6 +64,12 @@ export default function Header() {
             <Link href="/about" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
               About
             </Link>
+            <Link href="/files" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
+              Files
+            </Link>
+            <Link href="/support" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
+              Support
+            </Link>
             <LiveIndicator isAnyLive={isAnyLive} isLoading={isLoading} />
           </nav>
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
+import type { CommandContext } from './index';
 
-export function liveCommand(): React.ReactNode {
+export function liveCommand(_args: string[], _context: CommandContext): React.ReactNode {
   return (
     <div className="space-y-3">
       <div className="text-accent">Streaming Channels</div>

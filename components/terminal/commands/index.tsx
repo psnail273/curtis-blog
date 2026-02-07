@@ -6,10 +6,18 @@ import { lsCommand } from './ls';
 import { catCommand } from './cat';
 import { liveCommand } from './live';
 import { contactCommand } from './contact';
+import { downloadCommand } from './download';
+import { cdCommand } from './cd';
+import { pwdCommand } from './pwd';
+
+export interface CommandContext {
+  currentDirectory: string;
+  setCurrentDirectory: (dir: string) => void;
+}
 
 // Type definitions
 export type CommandResult = React.ReactNode | ClearSignal;
-export type CommandHandler = (args: string[]) => CommandResult;
+export type CommandHandler = (args: string[], context: CommandContext) => CommandResult;
 
 export interface CommandDefinition {
   name: string;
@@ -37,13 +45,28 @@ export const commands: Record<string, CommandDefinition> = {
   },
   ls: {
     name: 'ls',
-    description: 'List articles and directories',
+    description: 'List articles, files, and directories',
     handler: lsCommand,
   },
   cat: {
     name: 'cat',
-    description: 'Display article details',
+    description: 'Display article or file details',
     handler: catCommand,
+  },
+  cd: {
+    name: 'cd',
+    description: 'Change current directory',
+    handler: cdCommand,
+  },
+  pwd: {
+    name: 'pwd',
+    description: 'Print current directory',
+    handler: pwdCommand,
+  },
+  download: {
+    name: 'download',
+    description: 'Download a file',
+    handler: downloadCommand,
   },
   live: {
     name: 'live',
@@ -58,20 +81,17 @@ export const commands: Record<string, CommandDefinition> = {
 };
 
 // Execute command function
-export function executeCommand(input: string): CommandResult {
+export function executeCommand(input: string, context: CommandContext): CommandResult {
   const trimmed = input.trim();
   if (!trimmed) return null;
 
-  // Parse command: split by spaces, first word is command name, rest are args
   const parts = trimmed.split(/\s+/);
   const commandName = parts[0].toLowerCase();
   const args = parts.slice(1);
 
-  // Look up command in registry
   const commandDef = commands[commandName];
 
   if (!commandDef) {
-    // Unknown command error
     return (
       <p className="text-muted">
         command not found: {commandName}. Type &apos;help&apos; for available commands.
@@ -79,8 +99,7 @@ export function executeCommand(input: string): CommandResult {
     );
   }
 
-  // Execute command handler
-  return commandDef.handler(args);
+  return commandDef.handler(args, context);
 }
 
 // Re-export CLEAR_TERMINAL_SIGNAL for Terminal.tsx

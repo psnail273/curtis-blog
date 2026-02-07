@@ -1,6 +1,7 @@
 import React from 'react';
+import type { CommandContext } from './index';
 
-export function whoamiCommand(): React.ReactNode {
+export function whoamiCommand(_args: string[], _context: CommandContext): React.ReactNode {
   return (
     <div className="space-y-3">
       <div className="text-accent">Curtis Israel</div>

@@ -198,6 +198,36 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef }: Mobil
           >
             About
           </Link>
+          <Link
+            href="/files"
+            onClick={onClose}
+            className={cn(
+              'nav-link-mobile block w-full text-left',
+              'px-4 py-3 rounded-lg',
+              'text-lg font-medium text-foreground',
+              'transition-colors duration-200',
+              'hover:bg-accent/10 hover:text-accent',
+              'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+              'min-h-[44px] flex items-center'
+            )}
+          >
+            Files
+          </Link>
+          <Link
+            href="/support"
+            onClick={onClose}
+            className={cn(
+              'nav-link-mobile block w-full text-left',
+              'px-4 py-3 rounded-lg',
+              'text-lg font-medium text-foreground',
+              'transition-colors duration-200',
+              'hover:bg-accent/10 hover:text-accent',
+              'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+              'min-h-[44px] flex items-center'
+            )}
+          >
+            Support
+          </Link>
         </nav>
 
         {/* Live indicator (only when live) */}

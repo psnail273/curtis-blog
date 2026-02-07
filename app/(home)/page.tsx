@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import StreamingStatus from '@/components/streaming/StreamingStatus';
 import { TerminalFallback } from '@/components/terminal/TerminalFallback';
 
@@ -30,6 +31,17 @@ export default function Home() {
 
       {/* Streaming Status: Prominent and actionable */}
       <StreamingStatus />
+
+      {/* Support CTA: Subtle encouragement */}
+      <section className="border-t border-border pt-8">
+        <p className="text-body text-lg leading-relaxed">
+          Enjoy what you read here?{' '}
+          <Link href="/support">
+            Consider supporting the blog
+          </Link>{' '}
+          and help keep it going.
+        </p>
+      </section>
     </div>
   );
 }

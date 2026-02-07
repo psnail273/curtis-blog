@@ -5,6 +5,7 @@ import { TerminalWindow } from './TerminalWindow';
 import { TerminalOutput } from './TerminalOutput';
 import { TerminalInput } from './TerminalInput';
 import { executeCommand, CLEAR_TERMINAL_SIGNAL } from './commands';
+import type { CommandContext } from './commands';
 import './terminal.css';
 
 export interface CommandHistoryEntry {
@@ -12,11 +13,13 @@ export interface CommandHistoryEntry {
   command: string;
   output: React.ReactNode;
   timestamp: number;
+  directory: string;
 }
 
 export function Terminal() {
   const [commandHistory, setCommandHistory] = useState<CommandHistoryEntry[]>([]);
   const [currentInput, setCurrentInput] = useState('');
+  const [currentDirectory, setCurrentDirectory] = useState('~');
   const [animatingEntryId, setAnimatingEntryId] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [skipSignal, setSkipSignal] = useState(false);
@@ -36,6 +39,7 @@ export function Terminal() {
           </>
         ),
         timestamp: Date.now(),
+        directory: '~',
       },
     ]);
 
@@ -90,7 +94,12 @@ export function Terminal() {
     // Don't allow new commands while animating
     if (isAnimating) return;
 
-    const output = executeCommand(trimmed);
+    const context: CommandContext = {
+      currentDirectory,
+      setCurrentDirectory,
+    };
+
+    const output = executeCommand(trimmed, context);
 
     // Check for special CLEAR_TERMINAL_SIGNAL
     if (output === CLEAR_TERMINAL_SIGNAL) {
@@ -106,6 +115,7 @@ export function Terminal() {
             </>
           ),
           timestamp: Date.now(),
+          directory: currentDirectory,
         },
       ]);
       setCurrentInput('');
@@ -127,6 +137,7 @@ export function Terminal() {
           command: trimmed,
           output,
           timestamp: Date.now(),
+          directory: currentDirectory,
         },
       ];
       return updated.slice(-20);
@@ -166,6 +177,7 @@ export function Terminal() {
         onChange={setCurrentInput}
         onSubmit={handleCommandSubmit}
         disabled={isAnimating}
+        currentDirectory={currentDirectory}
       />
     </TerminalWindow>
   );

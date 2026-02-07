@@ -7,6 +7,7 @@ interface TerminalInputProps {
   onChange: (value: string) => void;
   onSubmit: (command: string) => void;
   disabled?: boolean;
+  currentDirectory?: string;
 }
 
 export function TerminalInput({
@@ -14,6 +15,7 @@ export function TerminalInput({
   onChange,
   onSubmit,
   disabled = false,
+  currentDirectory = '~',
 }: TerminalInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -35,15 +37,14 @@ export function TerminalInput({
 
   return (
     <div className="flex items-center gap-1 min-h-[44px] py-2 min-w-0">
-      {/* Prompt prefix - muted when disabled */}
       <label
         htmlFor="terminal-input"
         className={`font-terminal shrink-0 text-xs sm:text-sm ${
           disabled ? 'text-muted' : 'text-accent'
         }`}
       >
-        <span className="hidden sm:inline">visitor@curtis.blog $</span>
-        <span className="sm:hidden">visitor $</span>
+        <span className="hidden sm:inline">visitor@curtis.blog {currentDirectory} $</span>
+        <span className="sm:hidden">visitor {currentDirectory} $</span>
       </label>
 
       {/* Input field */}
