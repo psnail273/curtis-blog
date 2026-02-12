@@ -73,6 +73,7 @@
 /* Terminal input field */
 .terminal-input {
   caret-color: var(--accent); /* Amber/terracotta caret */
+  padding-left: 2px;
 }
 
 .terminal-input:focus {

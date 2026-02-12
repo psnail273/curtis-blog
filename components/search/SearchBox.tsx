@@ -15,12 +15,27 @@ export default function SearchBox() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [isMobile, setIsMobile] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const pathname = usePathname();
   const router = useRouter();
   const debouncedQuery = useDebounce(query, 300);
+
+  // Detect mobile viewport (matches the lg:hidden breakpoint used by MobileNav)
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 1023px)');
+    setIsMobile(mql.matches);
+
+    function handleChange(e: MediaQueryListEvent) {
+      setIsMobile(e.matches);
+    }
+
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
+  }, []);
 
   // Close dropdown and reset query when route changes
   useEffect(() => {
@@ -29,9 +44,9 @@ export default function SearchBox() {
     setQuery('');
   }, [pathname]);
 
-  // Calculate dropdown position when opening
+  // Calculate dropdown position when opening (desktop only)
   useEffect(() => {
-    if (isOpen && searchRef.current) {
+    if (isOpen && searchRef.current && !isMobile) {
       const rect = searchRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + 8,
@@ -39,11 +54,11 @@ export default function SearchBox() {
         width: rect.width,
       });
     }
-  }, [isOpen]);
+  }, [isOpen, isMobile]);
 
-  // Recalculate position on window resize
+  // Recalculate position on window resize (desktop only)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || isMobile) return;
 
     function handleResize() {
       if (searchRef.current) {
@@ -58,7 +73,7 @@ export default function SearchBox() {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isOpen]);
+  }, [isOpen, isMobile]);
 
   // Search effect using debounced query
   useEffect(() => {
@@ -122,6 +137,16 @@ export default function SearchBox() {
     router.push(`/articles/${slug}`);
   }, [router]);
 
+  // Scroll search input into view when focused on mobile (helps with virtual keyboard)
+  const handleFocus = useCallback(() => {
+    if (!isMobile) return;
+
+    // Small delay to let the virtual keyboard begin rendering
+    setTimeout(() => {
+      searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }, [isMobile]);
+
   // Memoized keyboard handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (!isOpen || results.length === 0) return;
@@ -152,18 +177,35 @@ export default function SearchBox() {
         <div className="search-input-wrapper flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg transition-all duration-200 text-muted min-h-[44px]">
           <SearchIcon />
           <input
+            ref={inputRef}
             type="text"
             placeholder="Search articles..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
             className="flex-1 border-none outline-none bg-transparent text-body text-base font-sans min-w-0 placeholder:text-caption"
             aria-label="Search articles"
           />
         </div>
+
+        {/* On mobile, render dropdown inline within the search container */}
+        {isMobile && isOpen && (
+          <SearchDropdown
+            ref={dropdownRef}
+            results={results}
+            query={query}
+            selectedIndex={selectedIndex}
+            onClose={handleSelect}
+            position={dropdownPosition}
+            inline
+          />
+        )}
       </div>
-      <Backdrop isVisible={isOpen} onClick={handleClose} />
-      {isOpen && (
+
+      {/* On desktop, render backdrop and fixed-position dropdown */}
+      {!isMobile && <Backdrop isVisible={isOpen} onClick={handleClose} />}
+      {!isMobile && isOpen && (
         <SearchDropdown
           ref={dropdownRef}
           results={results}

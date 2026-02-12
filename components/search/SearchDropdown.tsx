@@ -2,6 +2,7 @@
 
 import { forwardRef } from 'react';
 import { Article } from '@/types/article';
+import { cn } from '@/lib/utils';
 import SearchResultItem from './SearchResultItem';
 
 interface SearchDropdownProps {
@@ -10,6 +11,8 @@ interface SearchDropdownProps {
   selectedIndex: number;
   onClose: (slug: string) => void;
   position: { top: number; left: number; width: number };
+  /** When true, render inline (relative positioning) instead of fixed positioning */
+  inline?: boolean;
 }
 
 const SearchDropdownComponent = forwardRef<HTMLDivElement, SearchDropdownProps>(({
@@ -18,13 +21,17 @@ const SearchDropdownComponent = forwardRef<HTMLDivElement, SearchDropdownProps>(
   selectedIndex,
   onClose,
   position,
+  inline = false,
 }, ref) => {
-  const dropdownStyle: React.CSSProperties = {
-    top: `${position.top}px`,
-    left: `${position.left}px`,
-    width: `${position.width}px`,
-    maxWidth: 'calc(100vw - 16px)',
-  };
+  // Fixed positioning for desktop, no inline styles for mobile (uses flow layout)
+  const dropdownStyle: React.CSSProperties = inline
+    ? {}
+    : {
+      top: `${position.top}px`,
+      left: `${position.left}px`,
+      width: `${position.width}px`,
+      maxWidth: 'calc(100vw - 16px)',
+    };
 
   const handleDropdownClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -33,7 +40,12 @@ const SearchDropdownComponent = forwardRef<HTMLDivElement, SearchDropdownProps>(
   return (
     <div
       ref={ref}
-      className="fixed bg-card border border-border rounded-lg shadow-warm-lg max-h-[400px] overflow-y-auto z-[1001] pointer-events-auto"
+      className={cn(
+        'bg-card border border-border rounded-lg shadow-warm-lg max-h-[400px] overflow-y-auto pointer-events-auto',
+        inline
+          ? 'relative w-full mt-2 z-10'
+          : 'fixed z-[1001]'
+      )}
       style={dropdownStyle}
       onClick={handleDropdownClick}
       role="listbox"

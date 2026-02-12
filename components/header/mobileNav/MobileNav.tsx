@@ -143,7 +143,7 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef }: Mobil
         className={cn(
           'fixed top-0 right-0 h-dvh w-[280px] bg-background z-50',
           'lg:hidden', // Hide on desktop (1024px+)
-          'flex flex-col gap-6 p-6',
+          'flex flex-col gap-6 p-6 overflow-y-auto',
           'border-l border-border',
           'shadow-2xl',
           'transition-transform duration-300 ease-in-out transform-gpu',
@@ -151,6 +151,17 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef }: Mobil
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
+        {/* Search box section — placed at top so it is visible immediately */}
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-secondary">
+            Search Articles
+          </span>
+          <SearchBox />
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
         {/* Navigation links section */}
         <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
           <Link
@@ -236,17 +247,6 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef }: Mobil
             <LiveIndicator isAnyLive={isAnyLive} isLoading={isLoading} />
           </div>
         )}
-
-        {/* Divider */}
-        <div className="border-t border-border" />
-
-        {/* Search box section */}
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-secondary">
-            Search Articles
-          </span>
-          <SearchBox />
-        </div>
       </div>
     </>
   );
