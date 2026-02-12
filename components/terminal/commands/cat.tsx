@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import { mockArticles } from '@/lib/mock-articles';
 import { AsyncCommandOutput } from '../AsyncCommandOutput';
 import { fetchFileByName } from '../utils/fileApi';
 import { resolveFileType, formatFileSize, resolvePath, pathToArg } from '../utils/paths';
 import type { CommandContext } from './index';
 import type { FileRecord } from '@/types/file';
+import type { Article } from '@/types/article';
 
 /**
  * Render file metadata in terminal format.
@@ -33,12 +33,6 @@ function FileDetails({ file }: { file: FileRecord }) {
           <span className="text-muted shrink-0 w-20 sm:w-24 text-right">Uploaded:</span>
           <span className="text-body">{formattedDate}</span>
         </div>
-        {file.category && (
-          <div className="flex gap-2 sm:gap-3 min-w-0">
-            <span className="text-muted shrink-0 w-20 sm:w-24 text-right">Category:</span>
-            <span className="text-body">{file.category}</span>
-          </div>
-        )}
         {file.description && (
           <div className="flex gap-2 sm:gap-3 min-w-0">
             <span className="text-muted shrink-0 w-20 sm:w-24 text-right">Desc:</span>
@@ -143,6 +137,119 @@ function CatFileAsync({ fileName, typeDirName }: { fileName: string; typeDirName
   return <AsyncCommandOutput loadData={loadData} />;
 }
 
+/**
+ * Async cat component for displaying all articles.
+ */
+function CatArticlesAsync() {
+  const loadData = useCallback(async () => {
+    try {
+      const res = await fetch('/api/articles');
+      if (!res.ok) throw new Error('Failed to fetch articles');
+      const articles: Article[] = await res.json();
+
+      if (articles.length === 0) {
+        return <p className="text-muted">No articles found.</p>;
+      }
+
+      return (
+        <div className="space-y-5">
+          {articles.map((article) => {
+            const date = new Date(article.publishedAt);
+            const formattedDate = date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            });
+
+            return (
+              <div key={article.id} className="border-l-2 border-accent pl-3 space-y-1">
+                <div className="flex items-center gap-3">
+                  <span className="text-accent font-semibold">{article.title}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <span className="text-muted">{article.category}</span>
+                  <span className="text-muted">&bull;</span>
+                  <span className="text-muted">{formattedDate}</span>
+                  <span className="text-muted">&bull;</span>
+                  <span className="text-muted">{article.readTime} min read</span>
+                </div>
+                <p className="text-body mt-2">{article.excerpt}</p>
+                <a
+                  href={`/articles/${article.slug}`}
+                  className="text-accent hover:underline text-sm inline-block mt-1"
+                >
+                  Read full article &rarr;
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      );
+    } catch {
+      return <p className="text-muted">Error loading articles.</p>;
+    }
+  }, []);
+
+  return <AsyncCommandOutput loadData={loadData} />;
+}
+
+/**
+ * Async cat component for displaying a single article by slug.
+ */
+function CatArticleAsync({ slug }: { slug: string }) {
+  const loadData = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/articles/${slug}`);
+      if (!res.ok) {
+        return (
+          <p className="text-muted">
+            cat: articles/{slug}: No such file or directory
+          </p>
+        );
+      }
+      const article: Article = await res.json();
+
+      const date = new Date(article.publishedAt);
+      const formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+
+      return (
+        <div className="space-y-3">
+          <div className="text-accent text-lg font-semibold">{article.title}</div>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-muted">{article.category}</span>
+            <span className="text-muted">&bull;</span>
+            <span className="text-muted">{formattedDate}</span>
+            <span className="text-muted">&bull;</span>
+            <span className="text-muted">{article.readTime} min read</span>
+          </div>
+          <p className="text-body">{article.excerpt}</p>
+          <div className="text-muted mt-4">
+            [Content preview truncated. Read full article at /articles/{article.slug}]
+          </div>
+          <a
+            href={`/articles/${article.slug}`}
+            className="text-accent hover:underline inline-block mt-2"
+          >
+            Read full article &rarr;
+          </a>
+        </div>
+      );
+    } catch {
+      return (
+        <p className="text-muted">
+          cat: articles/{slug}: No such file or directory
+        </p>
+      );
+    }
+  }, [slug]);
+
+  return <AsyncCommandOutput loadData={loadData} />;
+}
+
 export function catCommand(args: string[], context: CommandContext): React.ReactNode {
   const rawTarget = args[0];
   const target = rawTarget
@@ -158,86 +265,15 @@ export function catCommand(args: string[], context: CommandContext): React.React
     );
   }
 
-  // Show all articles (backward compatible)
+  // Show all articles (from database)
   if (target === 'articles' || target === 'articles/') {
-    return (
-      <div className="space-y-5">
-        {mockArticles.map((article) => {
-          const date = new Date(article.publishedAt);
-          const formattedDate = date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          });
-
-          return (
-            <div key={article.id} className="border-l-2 border-accent pl-3 space-y-1">
-              <div className="flex items-center gap-3">
-                <span className="text-accent font-semibold">{article.title}</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <span className="text-muted">{article.category}</span>
-                <span className="text-muted">&bull;</span>
-                <span className="text-muted">{formattedDate}</span>
-                <span className="text-muted">&bull;</span>
-                <span className="text-muted">{article.readTime} min read</span>
-              </div>
-              <p className="text-body mt-2">{article.excerpt}</p>
-              <a
-                href={`/articles/${article.slug}`}
-                className="text-accent hover:underline text-sm inline-block mt-1"
-              >
-                Read full article &rarr;
-              </a>
-            </div>
-          );
-        })}
-      </div>
-    );
+    return <CatArticlesAsync />;
   }
 
-  // Specific article by slug (backward compatible)
+  // Specific article by slug (from database)
   if (target.startsWith('articles/')) {
     const slug = target.replace('articles/', '');
-    const article = mockArticles.find((a) => a.slug === slug);
-
-    if (!article) {
-      return (
-        <p className="text-muted">
-          cat: {target}: No such file or directory
-        </p>
-      );
-    }
-
-    const date = new Date(article.publishedAt);
-    const formattedDate = date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-
-    return (
-      <div className="space-y-3">
-        <div className="text-accent text-lg font-semibold">{article.title}</div>
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-muted">{article.category}</span>
-          <span className="text-muted">&bull;</span>
-          <span className="text-muted">{formattedDate}</span>
-          <span className="text-muted">&bull;</span>
-          <span className="text-muted">{article.readTime} min read</span>
-        </div>
-        <p className="text-body">{article.excerpt}</p>
-        <div className="text-muted mt-4">
-          [Content preview truncated. Read full article at /articles/{article.slug}]
-        </div>
-        <a
-          href={`/articles/${article.slug}`}
-          className="text-accent hover:underline inline-block mt-2"
-        >
-          Read full article &rarr;
-        </a>
-      </div>
-    );
+    return <CatArticleAsync slug={slug} />;
   }
 
   // Cat a file: "cat files/<type>/<filename>"

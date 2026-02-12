@@ -12,7 +12,6 @@ function toFileRecord(row: FileRow): FileRecord {
     path: row.path,
     type: row.type,
     size: row.size,
-    category: row.category,
     uploadDate: row.upload_date,
     description: row.description,
     url: row.url,
@@ -25,7 +24,6 @@ function toFileRecord(row: FileRow): FileRecord {
  *
  * Returns an array of file records. Supports optional query params:
  *   - type: Filter by file type (code, video, pdf, image, document, other)
- *   - category: Filter by category
  *   - path: Filter by path prefix (matches files whose path starts with the value)
  */
 export async function GET(request: NextRequest) {
@@ -33,7 +31,6 @@ export async function GET(request: NextRequest) {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
-    const category = searchParams.get('category');
     const path = searchParams.get('path');
 
     // Validate type param if provided
@@ -44,41 +41,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Build query with optional filters using parameterized statements
     let rows: FileRow[];
 
-    if (type && category && path) {
-      rows = await sql`
-        SELECT * FROM files
-        WHERE type = ${type} AND category = ${category} AND path LIKE ${path + '%'}
-        ORDER BY upload_date DESC
-      ` as FileRow[];
-    } else if (type && category) {
-      rows = await sql`
-        SELECT * FROM files
-        WHERE type = ${type} AND category = ${category}
-        ORDER BY upload_date DESC
-      ` as FileRow[];
-    } else if (type && path) {
+    if (type && path) {
       rows = await sql`
         SELECT * FROM files
         WHERE type = ${type} AND path LIKE ${path + '%'}
         ORDER BY upload_date DESC
       ` as FileRow[];
-    } else if (category && path) {
-      rows = await sql`
-        SELECT * FROM files
-        WHERE category = ${category} AND path LIKE ${path + '%'}
-        ORDER BY upload_date DESC
-      ` as FileRow[];
     } else if (type) {
       rows = await sql`
         SELECT * FROM files WHERE type = ${type}
-        ORDER BY upload_date DESC
-      ` as FileRow[];
-    } else if (category) {
-      rows = await sql`
-        SELECT * FROM files WHERE category = ${category}
         ORDER BY upload_date DESC
       ` as FileRow[];
     } else if (path) {

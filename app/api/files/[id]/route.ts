@@ -17,7 +17,6 @@ function toFileRecord(row: FileRow): FileRecord {
     path: row.path,
     type: row.type,
     size: row.size,
-    category: row.category,
     uploadDate: row.upload_date,
     description: row.description,
     url: row.url,

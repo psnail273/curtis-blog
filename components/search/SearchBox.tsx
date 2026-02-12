@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { mockArticles } from '@/lib/mock-articles';
 import { Article } from '@/types/article';
 import SearchDropdown from './SearchDropdown';
 import Backdrop from './Backdrop';
@@ -12,6 +11,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 export default function SearchBox() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Article[]>([]);
+  const [allArticles, setAllArticles] = useState<Article[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -23,6 +23,22 @@ export default function SearchBox() {
   const pathname = usePathname();
   const router = useRouter();
   const debouncedQuery = useDebounce(query, 300);
+
+  // Fetch articles from the API on mount for client-side search
+  useEffect(() => {
+    async function loadArticles() {
+      try {
+        const res = await fetch('/api/articles');
+        if (res.ok) {
+          const data = await res.json();
+          setAllArticles(data);
+        }
+      } catch (error) {
+        console.error('Error loading articles for search:', error);
+      }
+    }
+    loadArticles();
+  }, []);
 
   // Detect mobile viewport (matches the lg:hidden breakpoint used by MobileNav)
   useEffect(() => {
@@ -81,7 +97,7 @@ export default function SearchBox() {
       try {
         const normalizedQuery = debouncedQuery.trim().replace(/\s+/g, ' ').toLowerCase();
 
-        const filtered = mockArticles.filter((article) => {
+        const filtered = allArticles.filter((article) => {
           if (!article.title || !article.category || !article.slug) {
             return false;
           }
@@ -104,7 +120,7 @@ export default function SearchBox() {
       setIsOpen(false);
       setSelectedIndex(-1);
     }
-  }, [debouncedQuery]);
+  }, [debouncedQuery, allArticles]);
 
   // Click outside handler
   useEffect(() => {
@@ -184,7 +200,7 @@ export default function SearchBox() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
-            className="flex-1 border-none outline-none bg-transparent text-body text-base font-sans min-w-0 placeholder:text-caption"
+            className="flex-1 border-none outline-none bg-transparent text-body text-base font-sans min-w-0 placeholder:text-caption pl-1"
             aria-label="Search articles"
           />
         </div>

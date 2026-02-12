@@ -26,7 +26,6 @@ export interface FileRecord {
   path: string;
   type: FileType;
   size: number;
-  category: string | null;
   uploadDate: string;
   description: string | null;
   url: string;
@@ -43,7 +42,6 @@ export interface FileRow {
   path: string;
   type: FileType;
   size: number;
-  category: string | null;
   upload_date: string;
   description: string | null;
   url: string;

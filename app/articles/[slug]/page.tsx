@@ -1,15 +1,41 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { mockArticles } from '@/lib/mock-articles';
+import { getDb } from '@/lib/db';
+
+interface ArticleRow {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  published_at: string;
+  category: string;
+  read_time: number;
+  status: string;
+}
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
 }
 
+async function getPublishedArticle(slug: string): Promise<ArticleRow | null> {
+  try {
+    const sql = getDb();
+    const rows = await sql`
+      SELECT * FROM articles WHERE slug = ${slug} AND status = 'published'
+    ` as ArticleRow[];
+    return rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error('Error fetching article:', error);
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = mockArticles.find((a) => a.slug === slug);
+  const article = await getPublishedArticle(slug);
 
   if (!article) {
     return {
@@ -29,7 +55,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description,
       url: `/articles/${article.slug}`,
       type: 'article',
-      publishedTime: article.publishedAt,
+      publishedTime: article.published_at,
       authors: [article.author],
       tags: [article.category],
     },
@@ -55,7 +81,7 @@ function formatDate(dateString: string): string {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = mockArticles.find((a) => a.slug === slug);
+  const article = await getPublishedArticle(slug);
 
   if (!article) {
     notFound();
@@ -90,7 +116,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <span className="px-2 py-1 bg-accent/10 text-accent rounded-md text-xs font-medium">
             {article.category}
           </span>
-          <span>{article.readTime} min read</span>
+          <span>{article.read_time} min read</span>
         </div>
 
         <h1 className="mb-6">{article.title}</h1>
@@ -98,8 +124,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <div className="flex items-center gap-2 flex-wrap text-muted">
           <span className="font-medium text-foreground">{article.author}</span>
           <span aria-hidden="true">&middot;</span>
-          <time dateTime={article.publishedAt}>
-            {formatDate(article.publishedAt)}
+          <time dateTime={article.published_at}>
+            {formatDate(article.published_at)}
           </time>
         </div>
       </header>
@@ -116,7 +142,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 }
 
 export async function generateStaticParams() {
-  return mockArticles.map((article) => ({
-    slug: article.slug,
-  }));
+  try {
+    const sql = getDb();
+    const rows = await sql`
+      SELECT slug FROM articles WHERE status = 'published'
+    ` as { slug: string }[];
+    return rows.map((row) => ({ slug: row.slug }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
 }

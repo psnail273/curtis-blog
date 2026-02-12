@@ -18,6 +18,7 @@ export function TerminalInput({
   currentDirectory = '~',
 }: TerminalInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevDisabledRef = useRef(disabled);
 
   // Auto-focus only on desktop (screen width > 768px)
   useEffect(() => {
@@ -25,6 +26,18 @@ export function TerminalInput({
       inputRef.current?.focus();
     }
   }, []);
+
+  // Restore focus when animation completes (disabled transitions true -> false)
+  useEffect(() => {
+    const wasDisabled = prevDisabledRef.current;
+    prevDisabledRef.current = disabled;
+
+    if (wasDisabled && !disabled) {
+      if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+        inputRef.current?.focus();
+      }
+    }
+  }, [disabled]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {

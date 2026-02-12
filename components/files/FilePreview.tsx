@@ -1,3 +1,6 @@
+'use client';
+
+import dynamic from 'next/dynamic';
 import type { FileRecord } from '@/types/file';
 import { FileIcon } from '@/components/files/FileIcon';
 
@@ -5,12 +8,43 @@ interface FilePreviewProps {
   file: FileRecord;
 }
 
-/**
- * Renders an inline preview for a file based on its type.
- * - Images: inline <img> with lazy loading and constrained dimensions
- * - Code/text: scrollable monospace code block
- * - Other types: metadata-only card with type icon
- */
+/** Shared loading placeholder for lazy-loaded preview components. */
+function PreviewLoading() {
+  return (
+    <div className="rounded-lg border border-border bg-background p-6">
+      <div className="flex items-center justify-center py-8" role="status" aria-label="Loading preview">
+        <p className="text-sm text-muted">Loading preview...</p>
+      </div>
+    </div>
+  );
+}
+
+// Lazy-load preview sub-components to minimize initial bundle size
+const PdfPreview = dynamic(
+  () => import('@/components/files/previews/PdfPreview').then(mod => ({ default: mod.PdfPreview })),
+  { loading: () => <PreviewLoading /> }
+);
+
+const VideoPreview = dynamic(
+  () => import('@/components/files/previews/VideoPreview').then(mod => ({ default: mod.VideoPreview })),
+  { loading: () => <PreviewLoading /> }
+);
+
+const JsonPreview = dynamic(
+  () => import('@/components/files/previews/JsonPreview').then(mod => ({ default: mod.JsonPreview })),
+  { loading: () => <PreviewLoading /> }
+);
+
+const MarkdownPreview = dynamic(
+  () => import('@/components/files/previews/MarkdownPreview').then(mod => ({ default: mod.MarkdownPreview })),
+  { loading: () => <PreviewLoading /> }
+);
+
+const DocxPreview = dynamic(
+  () => import('@/components/files/previews/DocxPreview').then(mod => ({ default: mod.DocxPreview })),
+  { loading: () => <PreviewLoading /> }
+);
+
 export function FilePreview({ file }: FilePreviewProps) {
   if (file.type === 'image') {
     return (
@@ -26,6 +60,29 @@ export function FilePreview({ file }: FilePreviewProps) {
     );
   }
 
+  if (file.type === 'pdf') {
+    return <PdfPreview file={file} />;
+  }
+
+  if (file.type === 'video') {
+    return <VideoPreview file={file} />;
+  }
+
+  const ext = file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase();
+
+  if (ext === 'json') {
+    return <JsonPreview file={file} />;
+  }
+
+  if (ext === 'md' || ext === 'markdown') {
+    return <MarkdownPreview file={file} />;
+  }
+
+  if (ext === 'docx' || ext === 'doc') {
+    return <DocxPreview file={file} />;
+  }
+
+  // Code preview (unchanged)
   if (file.type === 'code') {
     return (
       <div className="rounded-lg border border-border bg-background overflow-hidden">
@@ -47,7 +104,7 @@ export function FilePreview({ file }: FilePreviewProps) {
     );
   }
 
-  // Fallback for pdf, video, document, other
+  // Fallback for document, other, and unrecognized types
   return (
     <div className="flex flex-col items-center justify-center py-10 px-6 rounded-lg border border-border bg-background text-center">
       <div className="text-accent mb-3">

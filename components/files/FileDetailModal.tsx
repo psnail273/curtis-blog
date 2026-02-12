@@ -188,9 +188,6 @@ export function FileDetailModal({ fileId, onClose }: FileDetailModalProps) {
                 <MetadataItem label="Size" value={formatFileSize(file.size)} />
                 <MetadataItem label="Uploaded" value={formatDate(file.uploadDate)} />
                 <MetadataItem label="Path" value={file.path} />
-                {file.category && (
-                  <MetadataItem label="Category" value={file.category} />
-                )}
                 {file.metadata.author && (
                   <MetadataItem label="Author" value={file.metadata.author} />
                 )}

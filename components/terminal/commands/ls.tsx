@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import { mockArticles } from '@/lib/mock-articles';
 import { AsyncCommandOutput } from '../AsyncCommandOutput';
 import { fetchFiles } from '../utils/fileApi';
 import { FILE_TYPE_DIRS, resolveFileType, formatFileSize, getFileTypeIndicator, resolvePath, pathToArg } from '../utils/paths';
 import type { CommandContext } from './index';
 import type { FileRecord, FileType } from '@/types/file';
+import type { Article } from '@/types/article';
 
 /**
  * Render a list of files in terminal format.
@@ -67,6 +67,44 @@ function LsFilesAsync({ type }: { type: FileType }) {
   return <AsyncCommandOutput loadData={loadData} />;
 }
 
+/**
+ * Async ls component for listing articles from the database.
+ */
+function LsArticlesAsync() {
+  const loadData = useCallback(async () => {
+    try {
+      const res = await fetch('/api/articles');
+      if (!res.ok) throw new Error('Failed to fetch articles');
+      const articles: Article[] = await res.json();
+
+      if (articles.length === 0) {
+        return <p className="text-muted">No articles found.</p>;
+      }
+
+      return (
+        <div className="space-y-2">
+          <div className="text-muted mb-2">
+            {articles.length} article{articles.length !== 1 ? 's' : ''} found:
+          </div>
+          {articles.map((article) => (
+            <div key={article.id} className="flex gap-3">
+              <span className="text-accent w-24 text-right">{article.category}</span>
+              <span className="text-body">{article.title}</span>
+            </div>
+          ))}
+          <div className="text-muted mt-3">
+            Use &apos;cat articles&apos; to see article excerpts
+          </div>
+        </div>
+      );
+    } catch {
+      return <p className="text-muted">Error loading articles.</p>;
+    }
+  }, []);
+
+  return <AsyncCommandOutput loadData={loadData} />;
+}
+
 export function lsCommand(args: string[], context: CommandContext): React.ReactNode {
   const rawTarget = args[0]?.replace(/\/+$/, '');
   let target: string | undefined;
@@ -91,24 +129,9 @@ export function lsCommand(args: string[], context: CommandContext): React.ReactN
     );
   }
 
-  // List articles (backward compatible)
+  // List articles from database
   if (target === 'articles') {
-    return (
-      <div className="space-y-2">
-        <div className="text-muted mb-2">
-          {mockArticles.length} article{mockArticles.length !== 1 ? 's' : ''} found:
-        </div>
-        {mockArticles.map((article) => (
-          <div key={article.id} className="flex gap-3">
-            <span className="text-accent w-24 text-right">{article.category}</span>
-            <span className="text-body">{article.title}</span>
-          </div>
-        ))}
-        <div className="text-muted mt-3">
-          Use &apos;cat articles&apos; to see article excerpts
-        </div>
-      </div>
-    );
+    return <LsArticlesAsync />;
   }
 
   // List files top-level: show subdirectories
