@@ -37,12 +37,9 @@ export default async function About() {
   const content = await getAboutContent();
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-16 pb-8">
       {/* Header section */}
-      <section>
-        {/* Decorative accent line */}
-        <div className="w-12 h-1 rounded-full mb-8 bg-accent" />
-
+      <section className="border-l-4 border-accent pl-6">
         {/* Page heading - serif font from global h1 styles */}
         <h1 className="mb-4">About</h1>
 

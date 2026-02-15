@@ -22,6 +22,7 @@ export const articles = pgTable('articles', {
   publishedAt: timestamp('published_at', { withTimezone: true }).notNull(),
   category: varchar('category', { length: 100 }).notNull(),
   readTime: integer('read_time').notNull(),
+  coverImage: text('cover_image'),
   status: varchar('status', { length: 20 }).notNull().default('draft'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

@@ -71,18 +71,12 @@ export function FilesPageContent() {
   return (
     <div className="max-w-3xl mx-auto pb-16">
       {/* Page Header */}
-      <header className="mb-12 md:mb-16">
-        <h1 className="mb-6">Files</h1>
+      <header className="mb-12 md:mb-16 border-l-4 border-accent pl-6">
+        <h1 className="mb-4">Files</h1>
 
-        <p className="text-lg md:text-xl leading-relaxed mb-6 max-w-2xl text-muted">
+        <p className="text-lg text-muted">
           Shared resources, code samples, and media files available for browsing and download.
         </p>
-
-        {/* Decorative separator */}
-        <div
-          className="w-16 h-[3px] rounded-full bg-accent"
-          aria-hidden="true"
-        />
       </header>
 
       {/* Search bar */}

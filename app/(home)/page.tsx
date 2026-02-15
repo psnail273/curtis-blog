@@ -1,47 +1,49 @@
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import StreamingStatus from '@/components/streaming/StreamingStatus';
-import { TerminalFallback } from '@/components/terminal/TerminalFallback';
+import type { Metadata } from 'next';
+import { getDb } from '@/lib/db';
+import { toArticle, type ArticleRow } from '@/lib/article-utils';
+import { HomePageContent } from './HomePageContent';
 
-// Dynamically import Terminal for code splitting
-const Terminal = dynamic(
-  () => import('@/components/terminal/Terminal').then(mod => ({ default: mod.Terminal })),
-  {
-    loading: () => (
-      <div className="py-12 md:py-16 animate-pulse">
-        <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] bg-border/50 rounded-lg" />
-      </div>
-    ),
-  }
-);
+export const metadata: Metadata = {
+  title: 'Home',
+  description: 'A personal blog by Curtis Israel covering politics, gaming, education, tech, and more.',
+};
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  // Await searchParams to mark route as dynamic (category read client-side via useSearchParams)
+  await searchParams;
+  const sql = getDb();
+
+  // Fetch all published articles, ordered by published date (newest first)
+  const rows = await sql`
+    SELECT
+      id, slug, title, excerpt, content, author,
+      published_at, category, read_time, cover_image,
+      status, created_at, updated_at
+    FROM articles
+    WHERE status = 'published'
+    ORDER BY published_at DESC
+  ` as ArticleRow[];
+
+  const articles = rows.map(toArticle);
+
+  // Extract unique categories from articles
+  const categories = Array.from(
+    new Set(articles.map(article => article.category))
+  ).sort();
+
   return (
-    <div className="flex flex-col gap-12 md:gap-16 py-8 md:py-12">
-      {/* Hidden h1 for semantic structure and screen readers */}
+    <div className="py-4 md:py-6">
+      {/* Hidden h1 for semantic structure and SEO */}
       <h1 className="sr-only">Curtis Israel&apos;s Blog</h1>
 
-      {/* Terminal: Signature brand element replacing IntroSection */}
-      <Terminal />
-
-      {/* Fallback for no-JS users */}
-      <noscript>
-        <TerminalFallback />
-      </noscript>
-
-      {/* Streaming Status: Prominent and actionable */}
-      <StreamingStatus />
-
-      {/* Support CTA: Subtle encouragement */}
-      <section className="border-t border-border pt-8">
-        <p className="text-body text-lg leading-relaxed">
-          Enjoy what you read here?{' '}
-          <Link href="/support">
-            Consider supporting the blog
-          </Link>{' '}
-          and help keep it going.
-        </p>
-      </section>
+      <HomePageContent
+        articles={articles}
+        categories={categories}
+      />
     </div>
   );
 }

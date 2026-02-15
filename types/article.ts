@@ -8,6 +8,7 @@ export interface Article {
   publishedAt: string;
   category: string;
   readTime: number;
+  coverImage?: string;
   status?: 'draft' | 'published';
   createdAt?: string;
   updatedAt?: string;

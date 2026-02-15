@@ -165,6 +165,114 @@ Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum. Null
     readTime: 4,
     status: 'published',
   },
+  {
+    slug: 'campaign-finance-reform-reality-check',
+    title: 'Campaign Finance Reform: A Reality Check',
+    excerpt:
+      'Money in politics is a problem everyone acknowledges, but few agree on how to fix. An honest look at what works, what doesn\'t, and what might actually be achievable.',
+    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
+
+Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+
+Maecenas faucibus mollis interdum. Sed posuere consectetur est at lobortis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+
+Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec sed odio dui. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.`,
+    author: 'Curtis Israel',
+    publishedAt: '2026-01-06T13:20:00Z',
+    category: 'Politics',
+    readTime: 9,
+    status: 'published',
+  },
+  {
+    slug: 'indie-games-creative-renaissance',
+    title: 'Indie Games and the Creative Renaissance',
+    excerpt:
+      'While AAA studios chase trends, indie developers are taking risks and creating some of the most innovative games in decades.',
+    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum.
+
+Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh. Nullam quis risus eget urna mollis ornare vel eu leo.
+
+Nullam id dolor id nibh ultricies vehicula ut id elit. Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit sit amet non magna. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Cras justo odio, dapibus ac facilisis in, egestas eget quam.
+
+Aenean lacinia bibendum nulla sed consectetur. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.`,
+    author: 'Curtis Israel',
+    publishedAt: '2026-01-02T15:45:00Z',
+    category: 'Gaming',
+    readTime: 6,
+    status: 'published',
+  },
+  {
+    slug: 'ai-code-assistants-developers-perspective',
+    title: 'AI Code Assistants: A Developer\'s Perspective',
+    excerpt:
+      'Are AI coding tools making us better programmers or just faster at writing mediocre code? One developer\'s experience after a year of daily use.',
+    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla. Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum.
+
+Cras justo odio, dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.
+
+Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam quis risus eget urna mollis ornare vel eu leo.
+
+Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Sed posuere consectetur est at lobortis.`,
+    author: 'Curtis Israel',
+    publishedAt: '2025-12-28T10:30:00Z',
+    category: 'Tech',
+    readTime: 7,
+    status: 'published',
+  },
+  {
+    slug: 'voter-turnout-youth-engagement',
+    title: 'Why Young Voters Matter More Than Ever',
+    excerpt:
+      'Youth voter turnout hit record highs in recent elections. Understanding what drives this engagement and how to sustain it.',
+    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.
+
+Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula ut id elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Curabitur blandit tempus porttitor.
+
+Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Maecenas faucibus mollis interdum. Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna mollis euismod.
+
+Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum.`,
+    author: 'Curtis Israel',
+    publishedAt: '2025-12-22T12:00:00Z',
+    category: 'Politics',
+    readTime: 8,
+    status: 'published',
+  },
+  {
+    slug: 'competitive-gaming-mental-health',
+    title: 'Competitive Gaming and Mental Health',
+    excerpt:
+      'The pressure to perform in esports and competitive gaming can take a real toll. What players, coaches, and the industry can do about it.',
+    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus.
+
+Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum. Donec sed odio dui. Duis mollis, est non commodo luctus, nisi erat porttitor ligula. Maecenas faucibus mollis interdum.
+
+Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam quis risus eget urna mollis ornare.
+
+Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum. Nullam id dolor id nibh ultricies vehicula ut id elit. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo.`,
+    author: 'Curtis Israel',
+    publishedAt: '2025-12-18T14:15:00Z',
+    category: 'Gaming',
+    readTime: 10,
+    status: 'published',
+  },
+  {
+    slug: 'standardized-testing-debate',
+    title: 'The Standardized Testing Debate',
+    excerpt:
+      'Standardized tests remain controversial in education. Are they measuring what matters, or just what\'s easy to measure?',
+    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit. Maecenas sed diam eget risus varius blandit sit amet non magna.
+
+Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+
+Maecenas faucibus mollis interdum. Sed posuere consectetur est at lobortis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus.
+
+Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec sed odio dui. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh. Praesent commodo cursus magna.`,
+    author: 'Curtis Israel',
+    publishedAt: '2025-12-14T09:00:00Z',
+    category: 'Education',
+    readTime: 12,
+    status: 'published',
+  },
 ];
 
 // ---------------------------------------------------------------------------

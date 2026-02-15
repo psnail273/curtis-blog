@@ -20,16 +20,15 @@ export const metadata: Metadata = {
 
 export default function Support() {
   return (
-    <div className="space-y-16">
-      <section>
-        <div className="w-12 h-1 rounded-full mb-8 bg-accent" />
+    <div className="space-y-10 pb-8">
+      <section className="border-l-4 border-accent pl-6">
         <h1 className="mb-4">Support</h1>
         <p className="text-lg text-muted">
           If you enjoy what you read here, consider helping keep it going.
         </p>
       </section>
 
-      <section className="max-w-3xl space-y-12">
+      <section className="max-w-3xl space-y-8">
         <div className="space-y-4">
           <h2>Why support matters</h2>
           <p className="text-lg leading-relaxed text-body">

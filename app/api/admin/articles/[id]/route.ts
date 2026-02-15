@@ -1,39 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { type ArticleRow, toArticle } from '@/lib/article-utils';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-interface ArticleRow {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  author: string;
-  published_at: string;
-  category: string;
-  read_time: number;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
-
-function toArticle(row: ArticleRow) {
-  return {
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    excerpt: row.excerpt,
-    content: row.content,
-    author: row.author,
-    publishedAt: row.published_at,
-    category: row.category,
-    readTime: row.read_time,
-    status: row.status,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
 
 /**
  * GET /api/admin/articles/[id]
@@ -123,6 +92,7 @@ export async function PATCH(
     const readTime = body.readTime ?? current.read_time;
     const status = body.status ?? current.status;
     const author = body.author ?? current.author;
+    const coverImage = body.coverImage !== undefined ? body.coverImage : current.cover_image;
 
     // If transitioning from draft to published, set publishedAt to now
     let publishedAt = current.published_at;
@@ -145,6 +115,7 @@ export async function PATCH(
         content = ${content},
         category = ${category},
         read_time = ${readTime},
+        cover_image = ${coverImage},
         status = ${status},
         author = ${author},
         published_at = ${publishedAt},

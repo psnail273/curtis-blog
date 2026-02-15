@@ -1,20 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getDb } from '@/lib/db';
-
-interface ArticleRow {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  author: string;
-  published_at: string;
-  category: string;
-  read_time: number;
-  status: string;
-}
+import type { ArticleRow } from '@/lib/article-utils';
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -88,10 +77,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   return (
-    <article className="max-w-3xl mx-auto">
+    <article className="max-w-prose mx-auto">
       <Link
-        href="/articles"
-        className="inline-flex items-center gap-2 text-muted mb-8 text-sm"
+        href="/"
+        className="inline-flex items-center gap-2 text-muted hover:text-accent mb-8 text-sm transition-all duration-200 hover:translate-x-[-4px]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -111,15 +100,30 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         Back to articles
       </Link>
 
-      <header className="mb-12">
-        <div className="flex items-center gap-3 flex-wrap text-sm text-muted mb-6">
-          <span className="px-2 py-1 bg-accent/10 text-accent rounded-md text-xs font-medium">
+      {/* Cover Image Hero (if available) */}
+      {article.cover_image && (
+        <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-lg overflow-hidden mb-8 md:mb-12">
+          <Image
+            src={article.cover_image}
+            alt={article.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+            className="object-cover"
+          />
+        </div>
+      )}
+
+      <header className="mb-8 md:mb-12">
+        <div className="flex items-center gap-3 flex-wrap text-sm text-muted mb-4 md:mb-6">
+          <span className="px-2.5 py-1 bg-accent/10 text-accent rounded-md text-sm font-medium">
             {article.category}
           </span>
           <span>{article.read_time} min read</span>
         </div>
 
-        <h1 className="mb-6">{article.title}</h1>
+        <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold leading-[1.15] tracking-[-0.02em] text-foreground mb-6 md:mb-8">
+          {article.title}
+        </h1>
 
         <div className="flex items-center gap-2 flex-wrap text-muted">
           <span className="font-medium text-foreground">{article.author}</span>
@@ -130,9 +134,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </div>
       </header>
 
-      <div className="max-w-none">
+      <div className="max-w-none text-base md:text-lg leading-[1.8] text-body">
         {article.content.split('\n\n').map((paragraph, index) => (
-          <p key={index} className="mb-6 leading-relaxed">
+          <p key={index} className="mb-6">
             {paragraph}
           </p>
         ))}

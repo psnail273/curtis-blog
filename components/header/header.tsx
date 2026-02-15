@@ -2,18 +2,26 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import SearchBox from '@/components/search/SearchBox';
 import LiveIndicator from './liveIndicator/liveIndicator';
 import HamburgerButton from './hamburgerButton/HamburgerButton';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
 import MobileNav from './mobileNav/MobileNav';
 
-export default function Header() {
-  const { isAnyLive, isLoading } = useLiveStatus();
+interface HeaderProps {
+  categories: string[];
+}
+
+export default function Header({ categories }: HeaderProps) {
+  const { status, streams, isLoading } = useLiveStatus();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const hamburgerRef = useRef<HTMLButtonElement>(null);
+
+  const activeCategory = pathname === '/' ? searchParams.get('category') : null;
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -32,51 +40,127 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex items-center justify-between w-full border-b border-border mb-6 overflow-x-hidden px-4 py-3 md:px-8 md:py-4 xl:px-[clamp(2rem,5vw,4rem)]">
-        {/* Left section: Logo */}
-        <div className="flex items-center shrink-0">
-          <Link
-            href="/"
-            className="text-[clamp(1.25rem,4vw,1.5rem)] font-semibold font-serif text-foreground transition-colors duration-200 whitespace-nowrap hover:text-accent"
+      <header className="w-full border-b border-border mb-6">
+        {/* Top Tier: Logo, Live Indicator (center), Search/Hamburger */}
+        <div className="flex items-center justify-between w-full overflow-x-hidden px-4 py-3 md:px-8 md:py-4">
+          {/* Left section: Logo */}
+          <div className="flex items-center shrink-0">
+            <Link
+              href="/"
+              className="text-xl md:text-2xl font-semibold font-serif text-foreground transition-colors duration-200 whitespace-nowrap hover:text-accent"
+            >
+              Curtis Israel
+            </Link>
+          </div>
+
+          {/* Center section: Live Indicator */}
+          <LiveIndicator status={status} streams={streams} isLoading={isLoading} />
+
+          {/* Right section: Search (desktop) / Hamburger (mobile) */}
+          <div className="flex items-center gap-4">
+            {/* Search - desktop only */}
+            <div className="hidden lg:flex items-center shrink-0">
+              <SearchBox />
+            </div>
+
+            {/* Mobile hamburger button */}
+            <div className="lg:hidden">
+              <HamburgerButton
+                ref={hamburgerRef}
+                isOpen={isMobileMenuOpen}
+                onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Tier: Category Tabs + Page Links (desktop only) */}
+        <div className="hidden lg:block border-t border-border">
+          <nav
+            className="flex items-center justify-center gap-6 md:gap-8 px-4 md:px-8 py-3 md:py-4 overflow-x-auto"
+            aria-label="Category navigation"
           >
-            Curtis Israel
-          </Link>
-        </div>
-
-        {/* Mobile hamburger button */}
-        <div className="lg:hidden">
-          <HamburgerButton
-            ref={hamburgerRef}
-            isOpen={isMobileMenuOpen}
-            onClick={() => setIsMobileMenuOpen(prev => !prev)}
-          />
-        </div>
-
-        {/* Center section: Nav links + Live indicator */}
-        <div className="hidden lg:flex items-center justify-center gap-4 flex-1">
-          <nav className="flex items-center gap-[clamp(1rem,3vw,2rem)] sm:gap-[clamp(2rem,5vw,4rem)]">
-            <Link href="/" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
-              Home
+            {/* All tab */}
+            <Link
+              href="/"
+              className={cn(
+                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+                'transition-colors duration-200',
+                activeCategory === null && pathname === '/'
+                  ? 'text-accent'
+                  : 'text-secondary hover:text-accent'
+              )}
+              aria-current={activeCategory === null && pathname === '/' ? 'page' : undefined}
+            >
+              All
             </Link>
-            <Link href="/articles" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
-              Articles
-            </Link>
-            <Link href="/about" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
+
+            {/* Category tabs */}
+            {categories.map((category) => (
+              <Link
+                key={category}
+                href={`/?category=${encodeURIComponent(category)}`}
+                className={cn(
+                  'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+                  'transition-colors duration-200',
+                  activeCategory === category
+                    ? 'text-accent'
+                    : 'text-secondary hover:text-accent'
+                )}
+                aria-current={activeCategory === category ? 'page' : undefined}
+              >
+                {category}
+              </Link>
+            ))}
+
+            {/* Divider */}
+            <div className="w-px h-5 bg-border" aria-hidden="true" />
+
+            {/* About link */}
+            <Link
+              href="/about"
+              className={cn(
+                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+                'transition-colors duration-200',
+                pathname === '/about'
+                  ? 'text-accent'
+                  : 'text-secondary hover:text-accent'
+              )}
+              aria-current={pathname === '/about' ? 'page' : undefined}
+            >
               About
             </Link>
-            <Link href="/files" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
+
+            {/* Files link */}
+            <Link
+              href="/files"
+              className={cn(
+                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+                'transition-colors duration-200',
+                pathname === '/files'
+                  ? 'text-accent'
+                  : 'text-secondary hover:text-accent'
+              )}
+              aria-current={pathname === '/files' ? 'page' : undefined}
+            >
               Files
             </Link>
-            <Link href="/support" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
+
+            {/* Support link */}
+            <Link
+              href="/support"
+              className={cn(
+                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+                'transition-colors duration-200',
+                pathname === '/support'
+                  ? 'text-accent'
+                  : 'text-secondary hover:text-accent'
+              )}
+              aria-current={pathname === '/support' ? 'page' : undefined}
+            >
               Support
             </Link>
-            <LiveIndicator isAnyLive={isAnyLive} isLoading={isLoading} />
           </nav>
-        </div>
-
-        {/* Right section: Search */}
-        <div className="hidden lg:flex items-center shrink-0">
-          <SearchBox />
         </div>
       </header>
 
@@ -85,6 +169,7 @@ export default function Header() {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         hamburgerButtonRef={hamburgerRef}
+        categories={categories}
       />
     </>
   );

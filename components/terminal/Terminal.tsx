@@ -48,11 +48,16 @@ export function Terminal() {
     setIsAnimating(true);
   }, []);
 
-  // Auto-scroll to bottom when history changes
+  // Always keep terminal scrolled to the bottom
   useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
-    }
+    const el = contentRef.current;
+    if (!el) return;
+    const scrollToBottom = () => {
+      el.scrollTop = el.scrollHeight;
+    };
+    scrollToBottom();
+    // Also scroll after the next paint to catch layout shifts
+    requestAnimationFrame(scrollToBottom);
   }, [commandHistory]);
 
   // Smooth scroll callback for animation ticks
@@ -154,7 +159,7 @@ export function Terminal() {
     <TerminalWindow>
       <div
         ref={contentRef}
-        className="overflow-y-auto max-h-[250px] sm:max-h-[350px] md:max-h-[500px] overscroll-contain cursor-text"
+        className="terminal-scrollable overflow-y-auto max-h-[250px] sm:max-h-[350px] md:max-h-[500px] overscroll-contain cursor-text"
         onClick={() => {
           // Focus input when user clicks anywhere in terminal
           const input = document.getElementById('terminal-input');

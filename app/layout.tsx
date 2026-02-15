@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { Inter, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/header/header';
+import { Footer } from '@/components/footer/Footer';
 import { LiveStatusProvider, StreamConfig } from '@/contexts/LiveStatusContext';
 
 const inter = Inter({
@@ -62,11 +64,28 @@ if (process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID) {
   });
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch categories from database for header navigation
+  let categories: string[] = [];
+  try {
+    const { getDb } = await import('@/lib/db');
+    const sql = getDb();
+    const rows = await sql`
+      SELECT DISTINCT category
+      FROM articles
+      WHERE status = 'published'
+      ORDER BY category ASC
+    ` as { category: string }[];
+    categories = rows.map(r => r.category);
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+    // Continue with empty categories array
+  }
+
   return (
     <html lang="en">
       <body className={`${inter.variable} ${sourceSerif.variable} antialiased`}>
@@ -77,10 +96,13 @@ export default function RootLayout({
           Skip to main content
         </a>
         <LiveStatusProvider streams={streams}>
-          <Header />
-          <main id="main-content" className="mx-auto max-w-4xl px-4 md:px-8 mt-8">
+          <Suspense>
+            <Header categories={categories} />
+          </Suspense>
+          <main id="main-content" className="mx-auto max-w-6xl px-4 md:px-8 mt-4">
             {children}
           </main>
+          <Footer />
         </LiveStatusProvider>
       </body>
     </html>

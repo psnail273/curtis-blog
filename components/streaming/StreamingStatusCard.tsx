@@ -31,11 +31,16 @@ function getStreamUrl(
   switch (platform) {
     case 'twitch':
       return `https://twitch.tv/${username}`;
-    case 'youtube':
+    case 'youtube': {
       if (streamStatus?.isLive && streamStatus.metadata?.videoId) {
         return `https://youtube.com/watch?v=${streamStatus.metadata.videoId}`;
       }
+      const handle = process.env.NEXT_PUBLIC_YOUTUBE_HANDLE;
+      if (handle) {
+        return `https://youtube.com/@${handle}`;
+      }
       return `https://youtube.com/channel/${username}`;
+    }
     default:
       return '';
   }

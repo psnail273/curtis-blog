@@ -19,6 +19,7 @@ function Cmd({ name, desc }: { name: string; desc: string }) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function helpCommand(_args: string[], _context: CommandContext): React.ReactNode {
   return (
     <div className="space-y-3">

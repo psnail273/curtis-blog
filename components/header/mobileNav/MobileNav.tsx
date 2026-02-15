@@ -2,20 +2,23 @@
 
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import SearchBox from '@/components/search/SearchBox';
-import LiveIndicator from '../liveIndicator/liveIndicator';
-import { useLiveStatus } from '@/contexts/LiveStatusContext';
 
 interface MobileNavProps {
   isOpen: boolean;
   onClose: () => void;
   hamburgerButtonRef: React.RefObject<HTMLButtonElement | null>;
+  categories: string[];
 }
 
-export default function MobileNav({ isOpen, onClose, hamburgerButtonRef }: MobileNavProps) {
-  const { isAnyLive, isLoading } = useLiveStatus();
+export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categories }: MobileNavProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const panelRef = useRef<HTMLDivElement>(null);
+
+  const activeCategory = pathname === '/' ? searchParams.get('category') : null;
 
   // Focus trap: handle Tab/Shift+Tab to cycle through panel elements only
   useEffect(() => {
@@ -162,50 +165,77 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef }: Mobil
         {/* Divider */}
         <div className="border-t border-border" />
 
-        {/* Navigation links section */}
-        <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
+        {/* Category links section (primary) */}
+        <nav className="flex flex-col gap-3" aria-label="Categories">
+          <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
+            Categories
+          </span>
+
+          {/* All category */}
           <Link
             href="/"
             onClick={onClose}
             className={cn(
-              'nav-link-mobile block w-full text-left',
-              'px-4 py-3 rounded-lg',
-              'text-lg font-medium text-foreground',
+              'block w-full text-left px-4 py-3 rounded-lg',
+              'text-lg font-serif',
               'transition-colors duration-200',
-              'hover:bg-accent/10 hover:text-accent',
+              'min-h-[44px] flex items-center',
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              'min-h-[44px] flex items-center' // 44px minimum touch target
+              activeCategory === null
+                ? 'text-accent border-l-4 border-accent bg-accent/5'
+                : 'text-foreground hover:bg-accent/10 hover:text-accent'
             )}
+            aria-current={activeCategory === null ? 'page' : undefined}
           >
-            Home
+            All
           </Link>
-          <Link
-            href="/articles"
-            onClick={onClose}
-            className={cn(
-              'nav-link-mobile block w-full text-left',
-              'px-4 py-3 rounded-lg',
-              'text-lg font-medium text-foreground',
-              'transition-colors duration-200',
-              'hover:bg-accent/10 hover:text-accent',
-              'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              'min-h-[44px] flex items-center'
-            )}
-          >
-            Articles
-          </Link>
+
+          {/* Category links */}
+          {categories.map((category) => (
+            <Link
+              key={category}
+              href={`/?category=${encodeURIComponent(category)}`}
+              onClick={onClose}
+              className={cn(
+                'block w-full text-left px-4 py-3 rounded-lg',
+                'text-lg font-serif',
+                'transition-colors duration-200',
+                'min-h-[44px] flex items-center',
+                'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+                activeCategory === category
+                  ? 'text-accent border-l-4 border-accent bg-accent/5'
+                  : 'text-foreground hover:bg-accent/10 hover:text-accent'
+              )}
+              aria-current={activeCategory === category ? 'page' : undefined}
+            >
+              {category}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
+        {/* Page links section */}
+        <nav className="flex flex-col gap-2" aria-label="Pages">
+          <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
+            Pages
+          </span>
+
           <Link
             href="/about"
             onClick={onClose}
             className={cn(
-              'nav-link-mobile block w-full text-left',
-              'px-4 py-3 rounded-lg',
-              'text-lg font-medium text-foreground',
+              'block w-full text-left px-4 py-2 rounded-lg',
+              'text-base font-sans',
               'transition-colors duration-200',
-              'hover:bg-accent/10 hover:text-accent',
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              'min-h-[44px] flex items-center'
+              'min-h-[44px] flex items-center',
+              pathname === '/about'
+                ? 'text-accent border-l-4 border-accent bg-accent/5'
+                : 'text-muted hover:bg-accent/10 hover:text-accent'
             )}
+            aria-current={pathname === '/about' ? 'page' : undefined}
           >
             About
           </Link>
@@ -213,40 +243,48 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef }: Mobil
             href="/files"
             onClick={onClose}
             className={cn(
-              'nav-link-mobile block w-full text-left',
-              'px-4 py-3 rounded-lg',
-              'text-lg font-medium text-foreground',
+              'block w-full text-left px-4 py-2 rounded-lg',
+              'text-base font-sans',
               'transition-colors duration-200',
-              'hover:bg-accent/10 hover:text-accent',
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              'min-h-[44px] flex items-center'
+              'min-h-[44px] flex items-center',
+              pathname === '/files'
+                ? 'text-accent border-l-4 border-accent bg-accent/5'
+                : 'text-muted hover:bg-accent/10 hover:text-accent'
             )}
+            aria-current={pathname === '/files' ? 'page' : undefined}
           >
             Files
           </Link>
+        </nav>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
+        {/* More links section */}
+        <nav className="flex flex-col gap-2" aria-label="More">
+          <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
+            More
+          </span>
+
           <Link
             href="/support"
             onClick={onClose}
             className={cn(
-              'nav-link-mobile block w-full text-left',
-              'px-4 py-3 rounded-lg',
-              'text-lg font-medium text-foreground',
+              'block w-full text-left px-4 py-2 rounded-lg',
+              'text-base font-sans',
               'transition-colors duration-200',
-              'hover:bg-accent/10 hover:text-accent',
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              'min-h-[44px] flex items-center'
+              'min-h-[44px] flex items-center',
+              pathname === '/support'
+                ? 'text-accent border-l-4 border-accent bg-accent/5'
+                : 'text-muted hover:bg-accent/10 hover:text-accent'
             )}
+            aria-current={pathname === '/support' ? 'page' : undefined}
           >
             Support
           </Link>
         </nav>
-
-        {/* Live indicator (only when live) */}
-        {!isLoading && isAnyLive && (
-          <div className="flex justify-center">
-            <LiveIndicator isAnyLive={isAnyLive} isLoading={isLoading} />
-          </div>
-        )}
       </div>
     </>
   );

@@ -53,6 +53,17 @@
   /* Dark shadow overrides (for component use) */
   --shadow-warm-dark: 0 4px 12px rgba(0, 0, 0, 0.25);
   --shadow-warm-lg-dark: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Typography Scale - Editorial */
+  --text-xs: 0.75rem;     /* 12px - fine print, badges */
+  --text-sm: 0.875rem;    /* 14px - captions, metadata */
+  --text-base: 1rem;      /* 16px - body text */
+  --text-lg: 1.125rem;    /* 18px - lead paragraphs, large body */
+  --text-xl: 1.25rem;     /* 20px - section subheadings */
+  --text-2xl: 1.5rem;     /* 24px - article list titles */
+  --text-3xl: 1.875rem;   /* 30px - featured article titles */
+  --text-4xl: 2.25rem;    /* 36px - page heroes */
+  --text-5xl: 3rem;       /* 48px - major headlines */
 }
 
 /* =========================================================================
@@ -272,7 +283,11 @@
     transition: width 0.3s ease;
   }
 
-  .nav-link:hover::after {
+  .nav-link:hover:not([aria-current="page"])::after {
+    width: 100%;
+  }
+
+  .nav-link[aria-current="page"]::after {
     width: 100%;
   }
 
@@ -359,145 +374,45 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
   }
+
+  /* Transition utilities for subtle, editorial interactions */
+  .transition-colors-subtle {
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .transition-lift {
+    transition: transform 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
 }
 
 /* =============================================
-   Markdown Preview Styles
+   Prose Content Styles (shared base for markdown/docx previews)
    ============================================= */
 
-.markdown-preview {
-  font-size: 0.9375rem;
-  line-height: 1.7;
-  color: var(--text-body);
-}
-
-.markdown-preview h1,
-.markdown-preview h2,
-.markdown-preview h3,
-.markdown-preview h4,
-.markdown-preview h5,
-.markdown-preview h6 {
-  color: var(--foreground);
-  margin-top: 1.25em;
-}
-
-.markdown-preview h1:first-child,
-.markdown-preview h2:first-child,
-.markdown-preview h3:first-child {
-  margin-top: 0;
-}
-
-.markdown-preview h1 { font-size: 1.5rem; }
-.markdown-preview h2 { font-size: 1.25rem; }
-.markdown-preview h3 { font-size: 1.125rem; }
-
-.markdown-preview p {
-  margin-bottom: 0.75em;
-}
-
-.markdown-preview p:last-child {
-  margin-bottom: 0;
-}
-
-.markdown-preview ul,
-.markdown-preview ol {
-  margin-bottom: 0.75em;
-  padding-left: 1.5em;
-}
-
-.markdown-preview ul {
-  list-style-type: disc;
-}
-
-.markdown-preview ol {
-  list-style-type: decimal;
-}
-
-.markdown-preview li {
-  margin-bottom: 0.25em;
-}
-
-.markdown-preview a {
-  color: var(--accent);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-.markdown-preview a:hover {
-  color: var(--accent-hover);
-}
-
-.markdown-preview code {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 0.875em;
-  background-color: var(--border);
-  padding: 0.15em 0.4em;
-  border-radius: 0.25rem;
-}
-
-.markdown-preview pre {
-  background-color: var(--border);
-  padding: 0.75em 1em;
-  border-radius: 0.375rem;
-  overflow-x: auto;
-  margin-bottom: 0.75em;
-}
-
-.markdown-preview pre code {
-  background-color: transparent;
-  padding: 0;
-}
-
-.markdown-preview blockquote {
-  border-left: 3px solid var(--accent);
-  padding-left: 1em;
-  margin-left: 0;
-  margin-bottom: 0.75em;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.markdown-preview hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 1.5em 0;
-}
-
-.markdown-preview strong {
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-.markdown-preview table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-bottom: 0.75em;
-}
-
-.markdown-preview th,
-.markdown-preview td {
-  border: 1px solid var(--border);
-  padding: 0.5em 0.75em;
-  text-align: left;
-}
-
-.markdown-preview th {
-  background-color: var(--card);
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-/* =============================================
-   DOCX Preview Styles (mammoth output)
-   ============================================= */
-
+.prose-content,
+.markdown-preview,
 .docx-preview {
   font-size: 0.9375rem;
   line-height: 1.7;
   color: var(--text-body);
 }
 
+.prose-content h1,
+.prose-content h2,
+.prose-content h3,
+.prose-content h4,
+.prose-content h5,
+.prose-content h6,
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6,
 .docx-preview h1,
 .docx-preview h2,
 .docx-preview h3,
@@ -508,42 +423,72 @@
   margin-top: 1.25em;
 }
 
+.prose-content h1:first-child,
+.prose-content h2:first-child,
+.prose-content h3:first-child,
+.markdown-preview h1:first-child,
+.markdown-preview h2:first-child,
+.markdown-preview h3:first-child,
 .docx-preview h1:first-child,
 .docx-preview h2:first-child,
 .docx-preview h3:first-child {
   margin-top: 0;
 }
 
+.prose-content h1,
+.markdown-preview h1,
 .docx-preview h1 { font-size: 1.5rem; }
+
+.prose-content h2,
+.markdown-preview h2,
 .docx-preview h2 { font-size: 1.25rem; }
+
+.prose-content h3,
+.markdown-preview h3,
 .docx-preview h3 { font-size: 1.125rem; }
 
+.prose-content p,
+.markdown-preview p,
 .docx-preview p {
   margin-bottom: 0.75em;
 }
 
+.prose-content p:last-child,
+.markdown-preview p:last-child,
 .docx-preview p:last-child {
   margin-bottom: 0;
 }
 
+.prose-content ul,
+.prose-content ol,
+.markdown-preview ul,
+.markdown-preview ol,
 .docx-preview ul,
 .docx-preview ol {
   margin-bottom: 0.75em;
   padding-left: 1.5em;
 }
 
+.prose-content ul,
+.markdown-preview ul,
 .docx-preview ul {
   list-style-type: disc;
 }
 
+.prose-content ol,
+.markdown-preview ol,
 .docx-preview ol {
   list-style-type: decimal;
 }
 
+.prose-content li,
+.markdown-preview li,
 .docx-preview li {
   margin-bottom: 0.25em;
 }
 
+.prose-content a,
+.markdown-preview a,
 .docx-preview a {
   color: var(--accent);
   text-decoration: underline;
@@ -551,25 +496,83 @@
   text-underline-offset: 2px;
 }
 
+.prose-content a:hover,
+.markdown-preview a:hover,
 .docx-preview a:hover {
   color: var(--accent-hover);
 }
 
+.prose-content code,
+.markdown-preview code,
+.docx-preview code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875em;
+  background-color: var(--border);
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+}
+
+.prose-content pre,
+.markdown-preview pre,
+.docx-preview pre {
+  background-color: var(--border);
+  padding: 0.75em 1em;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  margin-bottom: 0.75em;
+}
+
+.prose-content pre code,
+.markdown-preview pre code,
+.docx-preview pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.prose-content blockquote,
+.markdown-preview blockquote,
+.docx-preview blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1em;
+  margin-left: 0;
+  margin-bottom: 0.75em;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.prose-content hr,
+.markdown-preview hr,
+.docx-preview hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+
+.prose-content strong,
+.markdown-preview strong,
 .docx-preview strong {
   font-weight: 600;
   color: var(--foreground);
 }
 
+.prose-content em,
+.markdown-preview em,
 .docx-preview em {
   font-style: italic;
 }
 
+.prose-content table,
+.markdown-preview table,
 .docx-preview table {
   border-collapse: collapse;
   width: 100%;
   margin-bottom: 0.75em;
 }
 
+.prose-content th,
+.prose-content td,
+.markdown-preview th,
+.markdown-preview td,
 .docx-preview th,
 .docx-preview td {
   border: 1px solid var(--border);
@@ -577,12 +580,16 @@
   text-align: left;
 }
 
+.prose-content th,
+.markdown-preview th,
 .docx-preview th {
   background-color: var(--card);
   font-weight: 600;
   color: var(--foreground);
 }
 
+.prose-content img,
+.markdown-preview img,
 .docx-preview img {
   max-width: 100%;
   height: auto;

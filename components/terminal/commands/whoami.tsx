@@ -1,6 +1,7 @@
 import React from 'react';
 import type { CommandContext } from './index';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function whoamiCommand(_args: string[], _context: CommandContext): React.ReactNode {
   return (
     <div className="space-y-3">

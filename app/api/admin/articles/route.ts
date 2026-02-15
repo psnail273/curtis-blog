@@ -1,37 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
-
-interface ArticleRow {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  author: string;
-  published_at: string;
-  category: string;
-  read_time: number;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
-
-function toArticle(row: ArticleRow) {
-  return {
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    excerpt: row.excerpt,
-    content: row.content,
-    author: row.author,
-    publishedAt: row.published_at,
-    category: row.category,
-    readTime: row.read_time,
-    status: row.status,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
+import { type ArticleRow, toArticle } from '@/lib/article-utils';
 
 /**
  * GET /api/admin/articles
@@ -67,7 +36,7 @@ export async function POST(request: NextRequest) {
     const sql = getDb();
     const body = await request.json();
 
-    const { title, slug, excerpt, content, category, readTime, status, author } = body;
+    const { title, slug, excerpt, content, category, readTime, status, author, coverImage } = body;
 
     // Validate required fields
     const missing: string[] = [];
@@ -100,7 +69,7 @@ export async function POST(request: NextRequest) {
       : null;
 
     const rows = await sql`
-      INSERT INTO articles (title, slug, excerpt, content, category, read_time, status, author, published_at)
+      INSERT INTO articles (title, slug, excerpt, content, category, read_time, cover_image, status, author, published_at)
       VALUES (
         ${title},
         ${slug},
@@ -108,6 +77,7 @@ export async function POST(request: NextRequest) {
         ${content},
         ${category},
         ${readTime},
+        ${coverImage ?? null},
         ${articleStatus},
         ${articleAuthor},
         ${publishedAt}
