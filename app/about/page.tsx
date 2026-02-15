@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { getDb } from '@/lib/db';
 import { AboutPageMarkdown } from './AboutPageMarkdown';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'About',
   description: 'Learn more about Curtis Israel - writer, streamer, and thinker on politics, gaming, education, and tech.',
