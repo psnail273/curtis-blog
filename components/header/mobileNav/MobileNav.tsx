@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
-import SearchBox from '@/components/search/SearchBox';
+
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -156,17 +156,6 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        {/* Search box section — placed at top so it is visible immediately */}
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-secondary">
-            Search Articles
-          </span>
-          <SearchBox />
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-border" />
-
         {/* Category links section (primary) */}
         <nav className="flex flex-col gap-3" aria-label="Categories">
           <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">

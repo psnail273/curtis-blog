@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
-import SearchBox from '@/components/search/SearchBox';
+import { SearchTrigger } from '@/components/search/SearchTrigger';
 import HamburgerButton from './hamburgerButton/HamburgerButton';
 import MobileNav from './mobileNav/MobileNav';
 
@@ -50,8 +50,9 @@ export default function Header({ categories }: HeaderProps) {
             Curtis Israel
           </Link>
 
-          {/* Mobile hamburger button - absolute positioned on right */}
-          <div className="lg:hidden absolute right-4">
+          {/* Mobile: search + hamburger — absolute positioned on right */}
+          <div className="lg:hidden absolute right-4 flex items-center gap-1">
+            <SearchTrigger />
             <HamburgerButton
               ref={hamburgerRef}
               isOpen={isMobileMenuOpen}
@@ -167,9 +168,9 @@ export default function Header({ categories }: HeaderProps) {
             </Link>
           </nav>
 
-          {/* Search box on right */}
+          {/* Search trigger on right */}
           <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2">
-            <SearchBox />
+            <SearchTrigger />
           </div>
         </div>
       </header>
