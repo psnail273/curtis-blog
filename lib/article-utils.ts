@@ -18,6 +18,8 @@ export interface ArticleRow {
   status: string;
   created_at: string;
   updated_at: string;
+  pinned: boolean;
+  pinned_at: string | null;
 }
 
 /**
@@ -39,5 +41,7 @@ export function toArticle(row: ArticleRow): Article {
     status: row.status as 'draft' | 'published',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    pinned: row.pinned,
+    pinnedAt: row.pinned_at ?? undefined,
   };
 }

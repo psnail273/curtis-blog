@@ -94,6 +94,14 @@ export async function PATCH(
     const author = body.author ?? current.author;
     const coverImage = body.coverImage !== undefined ? body.coverImage : current.cover_image;
 
+    // Handle pinned toggle - set pinned_at when pinning, clear when unpinning
+    let pinned = current.pinned;
+    let pinnedAt = current.pinned_at;
+    if (body.pinned !== undefined) {
+      pinned = Boolean(body.pinned);
+      pinnedAt = pinned ? new Date().toISOString() : null;
+    }
+
     // If transitioning from draft to published, set publishedAt to now
     let publishedAt = current.published_at;
     if (status === 'published' && current.status === 'draft') {
@@ -119,6 +127,8 @@ export async function PATCH(
         status = ${status},
         author = ${author},
         published_at = ${publishedAt},
+        pinned = ${pinned},
+        pinned_at = ${pinnedAt},
         updated_at = ${now}
       WHERE id = ${id}
       RETURNING *

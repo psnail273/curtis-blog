@@ -22,7 +22,7 @@ interface TwitchStreamsResponse {
 // In-memory token cache
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
-async function getAccessToken(): Promise<string> {
+export async function getAccessToken(): Promise<string> {
   // Check if cached token is still valid
   if (cachedToken && cachedToken.expiresAt > Date.now()) {
     return cachedToken.token;

@@ -190,10 +190,11 @@ export default function SearchBox() {
   return (
     <>
       <div ref={searchRef} className="relative w-full max-w-full sm:max-w-[400px]">
-        <div className="search-input-wrapper flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg transition-all duration-200 text-muted min-h-[44px]">
+        <div className="search-input-wrapper flex items-center gap-2 px-3 py-2 bg-background rounded-lg transition-all duration-200 text-muted min-h-[44px]">
           <SearchIcon />
           <input
             ref={inputRef}
+            id="search-input"
             type="text"
             placeholder="Search articles..."
             value={query}

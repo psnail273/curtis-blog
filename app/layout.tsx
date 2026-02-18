@@ -5,6 +5,7 @@ import './globals.css';
 import Header from '@/components/header/header';
 import { Footer } from '@/components/footer/Footer';
 import { LiveStatusProvider, StreamConfig } from '@/contexts/LiveStatusContext';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -95,15 +96,17 @@ export default async function RootLayout({
         >
           Skip to main content
         </a>
-        <LiveStatusProvider streams={streams}>
-          <Suspense>
-            <Header categories={categories} />
-          </Suspense>
-          <main id="main-content" className="mx-auto max-w-6xl px-4 md:px-8 mt-4">
-            {children}
-          </main>
-          <Footer />
-        </LiveStatusProvider>
+        <AuthProvider>
+          <LiveStatusProvider streams={streams}>
+            <Suspense>
+              <Header categories={categories} />
+            </Suspense>
+            <main id="main-content" className="mx-auto max-w-6xl px-4 md:px-8 mt-4">
+              {children}
+            </main>
+            <Footer />
+          </LiveStatusProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -2,8 +2,13 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { getDb } from '@/lib/db';
 import type { ArticleRow } from '@/lib/article-utils';
+
+const CommentsSection = dynamic(
+  () => import('@/components/comments/CommentsSection').then(mod => ({ default: mod.CommentsSection }))
+);
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -58,11 +63,11 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 function formatDate(dateString: string): string {
   try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    const date = new Date(dateString);
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month} ${day}, ${year}`;
   } catch {
     return dateString;
   }
@@ -114,33 +119,53 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       )}
 
       <header className="mb-8 md:mb-12">
-        <div className="flex items-center gap-3 flex-wrap text-sm text-muted mb-4 md:mb-6">
-          <span className="px-2.5 py-1 bg-accent/10 text-accent rounded-md text-sm font-medium">
-            {article.category}
-          </span>
-          <span>{article.read_time} min read</span>
-        </div>
+        {/* Kicker — category label above headline */}
+        <span className="inline-block uppercase text-xs tracking-[0.15em] font-semibold text-accent mb-4 md:mb-5">
+          {article.category}
+        </span>
 
-        <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold leading-[1.15] tracking-[-0.02em] text-foreground mb-6 md:mb-8">
+        <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-[-0.02em] text-foreground mb-5 md:mb-6">
           {article.title}
         </h1>
 
-        <div className="flex items-center gap-2 flex-wrap text-muted">
-          <span className="font-medium text-foreground">{article.author}</span>
-          <span aria-hidden="true">&middot;</span>
-          <time dateTime={article.published_at}>
-            {formatDate(article.published_at)}
-          </time>
+        {/* Dek — excerpt as subtitle if available */}
+        {article.excerpt && (
+          <p className="font-serif text-lg md:text-xl text-muted leading-relaxed mb-6 md:mb-8">
+            {article.excerpt}
+          </p>
+        )}
+
+        {/* Byline — editorial style */}
+        <div className="flex items-center gap-3 pt-5 border-t border-border">
+          <div className="flex flex-col">
+            <span className="font-sans text-sm font-semibold text-foreground tracking-wide">
+              By {article.author}
+            </span>
+            <div className="flex items-center gap-2 text-caption text-xs mt-0.5">
+              <time dateTime={article.published_at}>
+                {formatDate(article.published_at)}
+              </time>
+              <span aria-hidden="true">&middot;</span>
+              <span>{article.read_time} min read</span>
+            </div>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-none text-base md:text-lg leading-[1.8] text-body">
+      {/* Article body — serif prose with drop cap */}
+      <div className="article-prose">
         {article.content.split('\n\n').map((paragraph, index) => (
-          <p key={index} className="mb-6">
+          <p key={index} className={index === 0 ? 'drop-cap' : undefined}>
             {paragraph}
           </p>
         ))}
       </div>
+
+      {/* Separator */}
+      <hr className="border-t border-border my-12 md:my-16" />
+
+      {/* Comments Section */}
+      <CommentsSection slug={slug} />
     </article>
   );
 }

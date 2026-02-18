@@ -310,6 +310,23 @@ function ArticlesManager() {
     }
   }
 
+  async function handleTogglePin(id: string, pinned: boolean) {
+    try {
+      const res = await fetch(`/api/admin/articles/${id}/pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pinned }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to update pin status');
+      }
+      await fetchArticles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update pin status');
+    }
+  }
+
   if (showForm) {
     return (
       <ArticleForm
@@ -323,7 +340,14 @@ function ArticlesManager() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl">Articles</h2>
+        <div>
+          <h2 className="text-xl">Articles</h2>
+          {articles.filter(a => a.pinned).length > 0 && (
+            <p className="text-xs text-muted mt-1">
+              {articles.filter(a => a.pinned).length} of 6 hero slots filled
+            </p>
+          )}
+        </div>
         <button
           onClick={handleCreate}
           className="px-4 py-2 bg-accent text-accent-foreground rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors"
@@ -350,6 +374,7 @@ function ArticlesManager() {
                 <th className="py-3 pr-4 font-medium text-muted">Title</th>
                 <th className="py-3 pr-4 font-medium text-muted hidden sm:table-cell">Category</th>
                 <th className="py-3 pr-4 font-medium text-muted hidden md:table-cell">Status</th>
+                <th className="py-3 pr-4 font-medium text-muted hidden md:table-cell">Pinned</th>
                 <th className="py-3 pr-4 font-medium text-muted hidden lg:table-cell">Published</th>
                 <th className="py-3 font-medium text-muted text-right">Actions</th>
               </tr>
@@ -363,6 +388,7 @@ function ArticlesManager() {
                       {article.category}
                       {' \u00B7 '}
                       {article.status === 'published' ? 'Published' : 'Draft'}
+                      {article.pinned && ' \u00B7 Pinned'}
                     </span>
                   </td>
                   <td className="py-3 pr-4 hidden sm:table-cell">
@@ -381,6 +407,20 @@ function ArticlesManager() {
                     >
                       {article.status === 'published' ? 'Published' : 'Draft'}
                     </span>
+                  </td>
+                  <td className="py-3 pr-4 hidden md:table-cell">
+                    <button
+                      onClick={() => handleTogglePin(article.id, !article.pinned)}
+                      className={cn(
+                        'px-2 py-0.5 rounded-md text-xs font-medium transition-colors',
+                        article.pinned
+                          ? 'bg-accent/10 text-accent hover:bg-accent/20'
+                          : 'bg-muted/50 text-muted hover:bg-muted/80'
+                      )}
+                      aria-label={article.pinned ? `Unpin "${article.title}"` : `Pin "${article.title}"`}
+                    >
+                      {article.pinned ? 'Pinned' : 'Pin'}
+                    </button>
                   </td>
                   <td className="py-3 pr-4 text-muted hidden lg:table-cell">
                     {article.publishedAt ? formatDate(article.publishedAt) : '\u2014'}

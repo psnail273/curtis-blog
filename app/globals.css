@@ -5,49 +5,49 @@
    ========================================================================= */
 
 :root {
-  /* Base colors - Light mode (Mid-Century Modern Warm) */
-  --background: #FAF7F2;
-  --foreground: #2C2418;
-  --secondary: #5C5347;
-  --border: #E5DDD0;
+  /* Base colors - Light mode (Clean Editorial) */
+  --background: #FAFAFA;
+  --foreground: #1A1A1A;
+  --secondary: #6B7280;
+  --border: #E5E7EB;
 
-  /* Accent colors - Terracotta & Gold */
+  /* Accent colors - Terracotta (editorial accent only) */
   --accent: #B5522F;
-  --accent-hover: #A84830;
+  --accent-hover: #9C4628;
   --accent-secondary: #D4A84B;
 
   /* Typography */
-  --text-body: #3D352A;
-  --text-muted: #766040;
-  --text-caption: #7F6648;
+  --text-body: #374151;
+  --text-muted: #6B7280;
+  --text-caption: #9CA3AF;
 
   /* shadcn variables */
   --radius: 0.625rem;
-  --card: #FAF7F2;
-  --card-foreground: #2C2418;
-  --popover: #FAF7F2;
-  --popover-foreground: #2C2418;
-  --primary: #2C2418;
-  --primary-foreground: #FAF7F2;
-  --secondary-foreground: #2C2418;
-  --muted: #E5DDD0;
-  --muted-foreground: #766040;
-  --accent-foreground: #FAF7F2;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  --primary: #1A1A1A;
+  --primary-foreground: #FAFAFA;
+  --secondary-foreground: #1A1A1A;
+  --muted: #E5E7EB;
+  --muted-foreground: #6B7280;
+  --accent-foreground: #FAFAFA;
   --destructive: oklch(0.577 0.245 27.325);
-  --input: #E5DDD0;
+  --input: #E5E7EB;
   --ring: #B5522F;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: #FAF7F2;
-  --sidebar-foreground: #2C2418;
-  --sidebar-primary: #2C2418;
-  --sidebar-primary-foreground: #FAF7F2;
-  --sidebar-accent: #E5DDD0;
-  --sidebar-accent-foreground: #2C2418;
-  --sidebar-border: #E5DDD0;
+  --sidebar: #FAFAFA;
+  --sidebar-foreground: #1A1A1A;
+  --sidebar-primary: #1A1A1A;
+  --sidebar-primary-foreground: #FAFAFA;
+  --sidebar-accent: #E5E7EB;
+  --sidebar-accent-foreground: #1A1A1A;
+  --sidebar-border: #E5E7EB;
   --sidebar-ring: #B5522F;
 
   /* Dark shadow overrides (for component use) */
@@ -64,6 +64,10 @@
   --text-3xl: 1.875rem;   /* 30px - featured article titles */
   --text-4xl: 2.25rem;    /* 36px - page heroes */
   --text-5xl: 3rem;       /* 48px - major headlines */
+
+  /* Editorial spacing tokens */
+  --section-gap: 4rem;        /* 64px between major sections */
+  --section-gap-mobile: 2.5rem; /* 40px on mobile */
 }
 
 /* =========================================================================
@@ -72,44 +76,44 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Base colors - Dark mode (Warm Charcoal) */
-    --background: #1A1612;
-    --foreground: #F5F0E8;
-    --secondary: #A89880;
-    --border: #3D3428;
+    /* Base colors - Dark mode (Clean Editorial Dark) */
+    --background: #111111;
+    --foreground: #F5F5F5;
+    --secondary: #9CA3AF;
+    --border: #2D2D2D;
 
-    /* Accent colors - Brighter for dark mode */
-    --accent: #E07A5F;
+    /* Accent colors - Warm terracotta for dark mode */
+    --accent: #D4845C;
     --accent-hover: #B5522F;
     --accent-secondary: #E8B84A;
 
     /* Typography */
-    --text-body: #E8E0D5;
-    --text-muted: #A89880;
-    --text-caption: #9A8E7E;
+    --text-body: #E5E7EB;
+    --text-muted: #9CA3AF;
+    --text-caption: #6B7280;
 
     /* shadcn variables */
-    --card: #2A2520;
-    --card-foreground: #F5F0E8;
-    --popover: #2A2520;
-    --popover-foreground: #F5F0E8;
-    --primary: #F5F0E8;
-    --primary-foreground: #1A1612;
-    --secondary-foreground: #F5F0E8;
-    --muted: #3D3428;
-    --muted-foreground: #A89880;
-    --accent-foreground: #1A1612;
+    --card: #1A1A1A;
+    --card-foreground: #F5F5F5;
+    --popover: #1A1A1A;
+    --popover-foreground: #F5F5F5;
+    --primary: #F5F5F5;
+    --primary-foreground: #111111;
+    --secondary-foreground: #F5F5F5;
+    --muted: #2D2D2D;
+    --muted-foreground: #9CA3AF;
+    --accent-foreground: #111111;
     --destructive: oklch(0.704 0.191 22.216);
-    --input: #3D3428;
-    --ring: #E07A5F;
-    --sidebar: #1A1612;
-    --sidebar-foreground: #F5F0E8;
-    --sidebar-primary: #F5F0E8;
-    --sidebar-primary-foreground: #1A1612;
-    --sidebar-accent: #3D3428;
-    --sidebar-accent-foreground: #F5F0E8;
-    --sidebar-border: #3D3428;
-    --sidebar-ring: #E07A5F;
+    --input: #2D2D2D;
+    --ring: #D4845C;
+    --sidebar: #111111;
+    --sidebar-foreground: #F5F5F5;
+    --sidebar-primary: #F5F5F5;
+    --sidebar-primary-foreground: #111111;
+    --sidebar-accent: #2D2D2D;
+    --sidebar-accent-foreground: #F5F5F5;
+    --sidebar-border: #2D2D2D;
+    --sidebar-ring: #D4845C;
   }
 }
 
@@ -205,20 +209,20 @@
 
   h1 {
     font-family: var(--font-serif);
-    font-size: clamp(1.75rem, 5vw, 2.5rem);
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
     color: var(--foreground);
     margin-bottom: 1rem;
   }
 
   h2 {
     font-family: var(--font-serif);
-    font-size: clamp(1.5rem, 4vw, 1.875rem);
-    font-weight: 600;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
     color: var(--foreground);
     margin-bottom: 0.875rem;
   }
@@ -287,16 +291,23 @@
     width: 100%;
   }
 
-  .nav-link[aria-current="page"]::after {
-    width: 100%;
-  }
-
   /* Search component styles that require pseudo-class selectors or
      relative color syntax not expressible with Tailwind utilities */
 
   .search-input-wrapper:focus-within {
     border-color: var(--ring);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 10%, transparent);
+  }
+
+  /* Keep wrapper focus styling, but suppress native inner input focus rectangle */
+  #search-input,
+  #search-input:focus,
+  #search-input:focus-visible {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   .search-input-wrapper:focus-within svg {
@@ -387,6 +398,40 @@
   .hover-lift:hover {
     transform: translateY(-2px);
   }
+
+  /* Drop cap for editorial article openings */
+  .drop-cap::first-letter {
+    float: left;
+    font-family: var(--font-serif);
+    font-size: 3.5em;
+    line-height: 0.8;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-right: 0.08em;
+    margin-top: 0.05em;
+  }
+
+  /* Thin editorial rule divider */
+  .editorial-rule {
+    border: none;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Center ornament divider (decorative diamond) */
+  .editorial-ornament {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .editorial-ornament::before,
+  .editorial-ornament::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--border);
+  }
 }
 
 /* =============================================
@@ -399,6 +444,22 @@
   font-size: 0.9375rem;
   line-height: 1.7;
   color: var(--text-body);
+}
+
+/* Article body prose — serif font for editorial reading experience */
+.article-prose {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--text-body);
+}
+
+.article-prose p {
+  margin-bottom: 1.5em;
+}
+
+.article-prose p:last-child {
+  margin-bottom: 0;
 }
 
 .prose-content h1,
@@ -633,7 +694,21 @@
   }
 }
 
+/* Nav link live pulse -- subtle text color pulse for "Streams" when live */
+@keyframes nav-live-pulse {
+  0%, 100% {
+    color: #ef4444; /* red-500 */
+  }
+  50% {
+    color: #fca5a5; /* red-300 — lighter pulse target */
+  }
+}
+
 /* Utility classes for animations */
+.animate-nav-live-pulse {
+  animation: nav-live-pulse 2s ease-in-out infinite;
+}
+
 .animate-live-pulse {
   animation: live-pulse 2s ease-in-out infinite;
 }
@@ -675,7 +750,8 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-live-pulse,
   .animate-live-dot-pulse,
-  .animate-fade-in-up {
+  .animate-fade-in-up,
+  .animate-nav-live-pulse {
     animation: none;
   }
 

@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useLiveStatus } from '@/contexts/LiveStatusContext';
 import SearchBox from '@/components/search/SearchBox';
 
 interface MobileNavProps {
@@ -17,6 +18,7 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const panelRef = useRef<HTMLDivElement>(null);
+  const { isAnyLive } = useLiveStatus();
 
   const activeCategory = pathname === '/' ? searchParams.get('category') : null;
 
@@ -181,11 +183,11 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
               'transition-colors duration-200',
               'min-h-[44px] flex items-center',
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              activeCategory === null
-                ? 'text-accent border-l-4 border-accent bg-accent/5'
+              activeCategory === null && pathname === '/'
+                ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                 : 'text-foreground hover:bg-accent/10 hover:text-accent'
             )}
-            aria-current={activeCategory === null ? 'page' : undefined}
+            aria-current={activeCategory === null && pathname === '/' ? 'page' : undefined}
           >
             All
           </Link>
@@ -203,7 +205,7 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
                 'min-h-[44px] flex items-center',
                 'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
                 activeCategory === category
-                  ? 'text-accent border-l-4 border-accent bg-accent/5'
+                  ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                   : 'text-foreground hover:bg-accent/10 hover:text-accent'
               )}
               aria-current={activeCategory === category ? 'page' : undefined}
@@ -223,6 +225,30 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
           </span>
 
           <Link
+            href="/streams"
+            onClick={onClose}
+            className={cn(
+              'block w-full text-left px-4 py-2 rounded-lg',
+              'text-base font-sans',
+              'transition-colors duration-200',
+              'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+              'min-h-[44px] flex items-center',
+              pathname === '/streams'
+                ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
+                : isAnyLive
+                  ? 'text-red-500 animate-nav-live-pulse hover:bg-accent/10'
+                  : 'text-muted hover:bg-accent/10 hover:text-accent'
+            )}
+            aria-current={pathname === '/streams' ? 'page' : undefined}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              {isAnyLive && (
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-live-dot-pulse" aria-hidden="true" />
+              )}
+              Streams
+            </span>
+          </Link>
+          <Link
             href="/about"
             onClick={onClose}
             className={cn(
@@ -232,7 +258,7 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
               'min-h-[44px] flex items-center',
               pathname === '/about'
-                ? 'text-accent border-l-4 border-accent bg-accent/5'
+                ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                 : 'text-muted hover:bg-accent/10 hover:text-accent'
             )}
             aria-current={pathname === '/about' ? 'page' : undefined}
@@ -249,7 +275,7 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
               'min-h-[44px] flex items-center',
               pathname === '/files'
-                ? 'text-accent border-l-4 border-accent bg-accent/5'
+                ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                 : 'text-muted hover:bg-accent/10 hover:text-accent'
             )}
             aria-current={pathname === '/files' ? 'page' : undefined}
@@ -277,7 +303,7 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
               'min-h-[44px] flex items-center',
               pathname === '/support'
-                ? 'text-accent border-l-4 border-accent bg-accent/5'
+                ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                 : 'text-muted hover:bg-accent/10 hover:text-accent'
             )}
             aria-current={pathname === '/support' ? 'page' : undefined}

@@ -12,6 +12,8 @@ export interface Article {
   status?: 'draft' | 'published';
   createdAt?: string;
   updatedAt?: string;
+  pinned?: boolean;
+  pinnedAt?: string;
 }
 
 export interface AboutPageSection {

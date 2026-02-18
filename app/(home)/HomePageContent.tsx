@@ -3,37 +3,33 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Article } from '@/types/article';
-import { FeaturedArticle } from '@/components/articles/FeaturedArticle';
-import { ArticleListItem } from '@/components/articles/ArticleListItem';
+import { HeroMosaic } from '@/components/home/HeroMosaic';
+import { CTABanner } from '@/components/home/CTABanner';
+import { CategorySection } from '@/components/home/CategorySection';
+import { getCategoryColor } from '@/lib/category-colors';
 
 interface HomePageContentProps {
+  heroArticles: Article[];
   articles: Article[];
   categories: string[];
 }
 
-const CATEGORY_ORDER = ['Gaming', 'Tech', 'Politics', 'Education'] as const;
-
-export function HomePageContent({ articles }: HomePageContentProps) {
+export function HomePageContent({ heroArticles, articles, categories }: HomePageContentProps) {
   const searchParams = useSearchParams();
-  const selectedCategory = searchParams.get('category') || null;
+  const activeCategory = searchParams.get('category');
 
-  // Group articles by category for "All" view
-  const groupedArticles = useMemo(() => {
-    const groups: Record<string, Article[]> = {};
-    CATEGORY_ORDER.forEach(cat => {
-      const categoryArticles = articles.filter(a => a.category === cat);
-      if (categoryArticles.length > 0) {
-        groups[cat] = categoryArticles;
-      }
-    });
-    return groups;
-  }, [articles]);
-
-  // Filter articles for single category view
-  const filteredArticles = useMemo(() => {
-    if (!selectedCategory) return articles;
-    return articles.filter(article => article.category === selectedCategory);
-  }, [articles, selectedCategory]);
+  // Group ALL articles by category — pinned articles appear in both hero AND their section
+  const articlesByCategory = useMemo(() => {
+    const grouped = new Map<string, Article[]>();
+    for (const article of articles) {
+      const list = grouped.get(article.category) ?? [];
+      list.push(article);
+      grouped.set(article.category, list);
+    }
+    return categories
+      .filter(cat => grouped.has(cat))
+      .map(cat => ({ category: cat, articles: grouped.get(cat)! }));
+  }, [articles, categories]);
 
   // Empty state - no articles at all
   if (articles.length === 0) {
@@ -64,9 +60,12 @@ export function HomePageContent({ articles }: HomePageContentProps) {
     );
   }
 
-  // Single category view
-  if (selectedCategory) {
-    if (filteredArticles.length === 0) {
+  // Category-specific view
+  if (activeCategory) {
+    const categoryArticles = articles.filter(a => a.category === activeCategory);
+
+    // Empty category or invalid category
+    if (categoryArticles.length === 0) {
       return (
         <div className="py-16 md:py-24 text-center">
           <div className="mb-4 text-muted" aria-hidden="true">
@@ -85,77 +84,50 @@ export function HomePageContent({ articles }: HomePageContentProps) {
             </svg>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-3">
-            No articles in this category
+            No articles in {activeCategory}
           </h2>
           <p className="font-sans text-base md:text-lg text-muted">
-            Try another category
+            Check back soon for new {activeCategory} content
           </p>
         </div>
       );
     }
 
-    const featured = filteredArticles[0];
-    const listArticles = filteredArticles.slice(1, 4);
-
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-1 md:gap-2">
-        <div className="lg:row-span-3">
-          <FeaturedArticle article={featured} priority={true} size="compact" />
-        </div>
-        {listArticles.map((article) => (
-          <ArticleListItem
-            key={article.id}
-            article={article}
-            isLast={true}
-          />
-        ))}
-      </div>
-    );
+    return <CategorySection articles={categoryArticles} priority={true} />;
   }
 
-  // "All" view - category-grouped layout
+  // Default "All" view
   return (
     <div className="flex flex-col">
-      {CATEGORY_ORDER.map((category, categoryIdx) => {
-        const categoryArticles = groupedArticles[category];
-        if (!categoryArticles || categoryArticles.length === 0) {
-          return null;
-        }
+      {/* Hero Mosaic Grid */}
+      <HeroMosaic articles={heroArticles} />
 
-        const featured = categoryArticles[0];
-        const listArticles = categoryArticles.slice(1, 4);
-        const isLastSection = categoryIdx === CATEGORY_ORDER.length - 1 ||
-          CATEGORY_ORDER.slice(categoryIdx + 1).every(cat => !groupedArticles[cat]);
+      {/* CTA Banner */}
+      <CTABanner />
+
+      {/* Category Sections — side-by-side editorial layout */}
+      {articlesByCategory.map(({ category, articles: catArticles }) => {
+        const catColor = getCategoryColor(category);
 
         return (
-          <section
-            key={category}
-            className={`mb-12 lg:mb-16 pb-12 lg:pb-16 border-b border-border ${
-              isLastSection ? 'last:border-b-0 last:pb-0 last:mb-0' : ''
-            }`}
-          >
-            {/* Category Heading */}
-            <h2 className="font-serif font-semibold text-2xl md:text-3xl text-foreground tracking-tight mb-6 md:mb-8">
-              {category}
-            </h2>
-
-            {/* Featured + List Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-1 md:gap-2">
-              <div className="lg:row-span-3">
-                <FeaturedArticle
-                  article={featured}
-                  priority={categoryIdx === 0}
-                  size="compact"
-                />
-              </div>
-              {listArticles.map((article) => (
-                <ArticleListItem
-                  key={article.id}
-                  article={article}
-                  isLast={true}
-                />
-              ))}
+          <section key={category} className="mb-10 md:mb-14">
+            {/* Category header with MCM color bar */}
+            <div className="flex items-center gap-3 mb-6 md:mb-8">
+              <div
+                className="w-1 h-5 rounded-full shrink-0"
+                style={{ backgroundColor: catColor.light }}
+                aria-hidden="true"
+              />
+              <span
+                className="text-xs uppercase tracking-[0.2em] font-semibold"
+                style={{ color: catColor.light }}
+              >
+                {category}
+              </span>
+              <div className="flex-1 h-px bg-border" aria-hidden="true" />
             </div>
+
+            <CategorySection articles={catArticles} />
           </section>
         );
       })}

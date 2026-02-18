@@ -4,10 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import SearchBox from '@/components/search/SearchBox';
-import LiveIndicator from './liveIndicator/liveIndicator';
-import HamburgerButton from './hamburgerButton/HamburgerButton';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
+import SearchBox from '@/components/search/SearchBox';
+import HamburgerButton from './hamburgerButton/HamburgerButton';
 import MobileNav from './mobileNav/MobileNav';
 
 interface HeaderProps {
@@ -15,11 +14,11 @@ interface HeaderProps {
 }
 
 export default function Header({ categories }: HeaderProps) {
-  const { status, streams, isLoading } = useLiveStatus();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const { isAnyLive } = useLiveStatus();
 
   const activeCategory = pathname === '/' ? searchParams.get('category') : null;
 
@@ -41,53 +40,37 @@ export default function Header({ categories }: HeaderProps) {
   return (
     <>
       <header className="w-full border-b border-border mb-6">
-        {/* Top Tier: Logo, Live Indicator (center), Search/Hamburger */}
-        <div className="flex items-center justify-between w-full overflow-x-hidden px-4 py-3 md:px-8 md:py-4">
-          {/* Left section: Logo */}
-          <div className="flex items-center shrink-0">
-            <Link
-              href="/"
-              className="text-xl md:text-2xl font-semibold font-serif text-foreground transition-colors duration-200 whitespace-nowrap hover:text-accent"
-            >
-              Curtis Israel
-            </Link>
-          </div>
+        {/* Top Tier: Centered Masthead */}
+        <div className="flex items-center justify-center py-4 md:py-6 px-4 md:px-8 relative">
+          {/* Centered masthead */}
+          <Link
+            href="/"
+            className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground tracking-tight uppercase hover:text-accent transition-colors"
+          >
+            Curtis Israel
+          </Link>
 
-          {/* Center section: Live Indicator */}
-          <LiveIndicator status={status} streams={streams} isLoading={isLoading} />
-
-          {/* Right section: Search (desktop) / Hamburger (mobile) */}
-          <div className="flex items-center gap-4">
-            {/* Search - desktop only */}
-            <div className="hidden lg:flex items-center shrink-0">
-              <SearchBox />
-            </div>
-
-            {/* Mobile hamburger button */}
-            <div className="lg:hidden">
-              <HamburgerButton
-                ref={hamburgerRef}
-                isOpen={isMobileMenuOpen}
-                onClick={() => setIsMobileMenuOpen(prev => !prev)}
-              />
-            </div>
+          {/* Mobile hamburger button - absolute positioned on right */}
+          <div className="lg:hidden absolute right-4">
+            <HamburgerButton
+              ref={hamburgerRef}
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+            />
           </div>
         </div>
 
-        {/* Bottom Tier: Category Tabs + Page Links (desktop only) */}
-        <div className="hidden lg:block border-t border-border">
-          <nav
-            className="flex items-center justify-center gap-6 md:gap-8 px-4 md:px-8 py-3 md:py-4 overflow-x-auto"
-            aria-label="Category navigation"
-          >
-            {/* All tab */}
+        {/* Bottom Tier: Navigation Bar (desktop only) */}
+        <div className="hidden lg:flex items-center justify-center relative border-t border-border px-4 md:px-8">
+          <nav className="flex items-center gap-6 py-3" aria-label="Main navigation">
+            {/* All link */}
             <Link
               href="/"
               className={cn(
                 'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
                 'transition-colors duration-200',
                 activeCategory === null && pathname === '/'
-                  ? 'text-accent'
+                  ? 'text-accent font-bold'
                   : 'text-secondary hover:text-accent'
               )}
               aria-current={activeCategory === null && pathname === '/' ? 'page' : undefined}
@@ -95,7 +78,7 @@ export default function Header({ categories }: HeaderProps) {
               All
             </Link>
 
-            {/* Category tabs */}
+            {/* Category links */}
             {categories.map((category) => (
               <Link
                 key={category}
@@ -104,7 +87,7 @@ export default function Header({ categories }: HeaderProps) {
                   'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
                   'transition-colors duration-200',
                   activeCategory === category
-                    ? 'text-accent'
+                    ? 'text-accent font-bold'
                     : 'text-secondary hover:text-accent'
                 )}
                 aria-current={activeCategory === category ? 'page' : undefined}
@@ -116,6 +99,28 @@ export default function Header({ categories }: HeaderProps) {
             {/* Divider */}
             <div className="w-px h-5 bg-border" aria-hidden="true" />
 
+            {/* Streams link (NEW) */}
+            <Link
+              href="/streams"
+              className={cn(
+                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+                'transition-colors duration-200',
+                pathname === '/streams'
+                  ? 'text-accent font-bold'
+                  : isAnyLive
+                    ? 'text-red-500 animate-nav-live-pulse'
+                    : 'text-secondary hover:text-accent'
+              )}
+              aria-current={pathname === '/streams' ? 'page' : undefined}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                {isAnyLive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-live-dot-pulse" aria-hidden="true" />
+                )}
+                Streams
+              </span>
+            </Link>
+
             {/* About link */}
             <Link
               href="/about"
@@ -123,7 +128,7 @@ export default function Header({ categories }: HeaderProps) {
                 'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
                 'transition-colors duration-200',
                 pathname === '/about'
-                  ? 'text-accent'
+                  ? 'text-accent font-bold'
                   : 'text-secondary hover:text-accent'
               )}
               aria-current={pathname === '/about' ? 'page' : undefined}
@@ -138,7 +143,7 @@ export default function Header({ categories }: HeaderProps) {
                 'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
                 'transition-colors duration-200',
                 pathname === '/files'
-                  ? 'text-accent'
+                  ? 'text-accent font-bold'
                   : 'text-secondary hover:text-accent'
               )}
               aria-current={pathname === '/files' ? 'page' : undefined}
@@ -153,7 +158,7 @@ export default function Header({ categories }: HeaderProps) {
                 'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
                 'transition-colors duration-200',
                 pathname === '/support'
-                  ? 'text-accent'
+                  ? 'text-accent font-bold'
                   : 'text-secondary hover:text-accent'
               )}
               aria-current={pathname === '/support' ? 'page' : undefined}
@@ -161,6 +166,11 @@ export default function Header({ categories }: HeaderProps) {
               Support
             </Link>
           </nav>
+
+          {/* Search box on right */}
+          <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2">
+            <SearchBox />
+          </div>
         </div>
       </header>
 
