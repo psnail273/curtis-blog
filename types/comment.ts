@@ -20,6 +20,8 @@ export interface CommentUser {
 export interface Comment {
   id: string;
   articleId: string;
+  parentId: string | null;
+  parentUserName: string | null;
   user: CommentUser;
   content: string;
   createdAt: string;

@@ -22,6 +22,7 @@ export interface CommentRow {
   id: string;
   article_id: string;
   user_id: string;
+  parent_id: string | null;
   content: string;
   created_at: string;
   updated_at: string;
@@ -35,6 +36,8 @@ export interface CommentWithUserRow {
   id: string;
   article_id: string;
   user_id: string;
+  parent_id: string | null;
+  parent_user_name: string | null;
   content: string;
   created_at: string;
   updated_at: string;
@@ -80,6 +83,8 @@ export function toComment(row: CommentWithUserRow): Comment {
   return {
     id: row.id,
     articleId: row.article_id,
+    parentId: row.parent_id,
+    parentUserName: row.parent_user_name,
     user: {
       id: row.user_id,
       name: row.user_name,
