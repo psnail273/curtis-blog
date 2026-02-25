@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Reply } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getInitials, getAvatarColor, formatRelativeTime } from '@/lib/comment-helpers';
 import { LikeButton } from './LikeButton';
@@ -10,18 +10,24 @@ import type { Comment } from '@/types/comment';
 
 interface CommentItemProps {
   comment: Comment;
+  depth: number;
   currentUserId?: string;
   isAdmin: boolean;
+  isAuthenticated: boolean;
   onDelete: (commentId: string) => Promise<void>;
   onToggleLike: (commentId: string) => Promise<void>;
+  onReply: () => void;
 }
 
 export function CommentItem({
   comment,
+  depth,
   currentUserId,
   isAdmin,
+  isAuthenticated,
   onDelete,
   onToggleLike,
+  onReply,
 }: CommentItemProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,6 +48,16 @@ export function CommentItem({
 
   return (
     <>
+      {/* Mobile: "Replying to @Username" label */}
+      {comment.parentId && comment.parentUserName && (
+        <a
+          href={`#comment-${comment.parentId}`}
+          className="md:hidden flex items-center gap-1 text-xs text-muted mb-1 hover:text-accent transition-colors"
+        >
+          <span aria-hidden="true">↩</span>
+          Replying to @{comment.parentUserName}
+        </a>
+      )}
       <article
         className={cn(
           'border border-border rounded-lg p-4 md:p-5 bg-card transition-all duration-200',
@@ -104,9 +120,18 @@ export function CommentItem({
               {comment.content}
             </p>
 
-            {/* Delete button (if authorized) */}
-            {canDelete && (
-              <div className="mt-2">
+            {/* Action buttons */}
+            <div className="mt-2 flex items-center gap-3">
+              {isAuthenticated && (
+                <button
+                  onClick={onReply}
+                  className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-accent transition-colors duration-200"
+                >
+                  <Reply className="size-3.5" aria-hidden="true" />
+                  Reply
+                </button>
+              )}
+              {canDelete && (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={isDeleting}
@@ -116,8 +141,8 @@ export function CommentItem({
                   <Trash2 className="size-3.5" aria-hidden="true" />
                   Delete
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </article>
