@@ -3,8 +3,11 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { ArrowLeft } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import type { ArticleRow } from '@/lib/article-utils';
+import { formatDateLong } from '@/lib/format-utils';
+import { ArticleContent } from '@/components/articles/ArticleContent';
 
 const CommentsSection = dynamic(
   () => import('@/components/comments/CommentsSection').then(mod => ({ default: mod.CommentsSection }))
@@ -49,7 +52,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description,
       url: `/articles/${article.slug}`,
       type: 'article',
-      publishedTime: article.published_at,
+      publishedTime: article.published_at ?? undefined,
       authors: [article.author],
       tags: [article.category],
     },
@@ -61,18 +64,6 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   };
 }
 
-function formatDate(dateString: string): string {
-  try {
-    const date = new Date(dateString);
-    const month = date.toLocaleDateString('en-US', { month: 'long' });
-    const day = date.getDate();
-    const year = date.getFullYear();
-    return `${month} ${day}, ${year}`;
-  } catch {
-    return dateString;
-  }
-}
-
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
   const article = await getPublishedArticle(slug);
@@ -82,90 +73,69 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   return (
-    <article className="max-w-prose mx-auto">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-muted hover:text-accent mb-8 text-sm transition-all duration-200 hover:translate-x-[-4px]"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+    <article>
+      <div className="max-w-prose mx-auto">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-muted hover:text-accent mb-8 text-sm transition-all duration-200 hover:translate-x-[-4px]"
         >
-          <path d="m12 19-7-7 7-7" />
-          <path d="M19 12H5" />
-        </svg>
-        Back to articles
-      </Link>
+          <ArrowLeft size={16} aria-hidden="true" />
+          Back to articles
+        </Link>
+      </div>
 
-      {/* Cover Image Hero (if available) */}
+      {/* Cover Image Hero — wider than prose for editorial impact */}
       {article.cover_image && (
-        <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-lg overflow-hidden mb-8 md:mb-12">
+        <div className="relative w-full max-w-4xl mx-auto aspect-[16/9] md:aspect-[21/9] rounded-lg overflow-hidden mb-8 md:mb-12">
           <Image
             src={article.cover_image}
             alt={article.title}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 896px"
             className="object-cover"
           />
         </div>
       )}
 
-      <header className="mb-8 md:mb-12">
-        {/* Kicker — category label above headline */}
-        <span className="inline-block uppercase text-xs tracking-[0.15em] font-semibold text-accent mb-4 md:mb-5">
-          {article.category}
-        </span>
+      <div className="max-w-prose mx-auto">
+        <header className="mb-8 md:mb-12">
+          <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-[-0.02em] text-foreground mb-5 md:mb-6">
+            {article.title}
+          </h1>
 
-        <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-[-0.02em] text-foreground mb-5 md:mb-6">
-          {article.title}
-        </h1>
+          {/* Dek — excerpt as subtitle if available */}
+          {article.excerpt && (
+            <p className="font-serif text-lg md:text-xl text-muted leading-relaxed mb-6 md:mb-8">
+              {article.excerpt}
+            </p>
+          )}
 
-        {/* Dek — excerpt as subtitle if available */}
-        {article.excerpt && (
-          <p className="font-serif text-lg md:text-xl text-muted leading-relaxed mb-6 md:mb-8">
-            {article.excerpt}
-          </p>
-        )}
-
-        {/* Byline — editorial style */}
-        <div className="flex items-center gap-3 pt-5 border-t border-border">
-          <div className="flex flex-col">
-            <span className="font-sans text-sm font-semibold text-foreground tracking-wide">
-              By {article.author}
-            </span>
-            <div className="flex items-center gap-2 text-caption text-xs mt-0.5">
-              <time dateTime={article.published_at}>
-                {formatDate(article.published_at)}
-              </time>
-              <span aria-hidden="true">&middot;</span>
-              <span>{article.read_time} min read</span>
+          {/* Byline — editorial style */}
+          <div className="flex items-center gap-3 pt-5 border-t border-border">
+            <div className="flex flex-col">
+              <span className="font-sans text-sm font-semibold text-foreground tracking-wide">
+                By {article.author}
+              </span>
+              <div className="flex items-center gap-2 text-caption text-xs mt-0.5">
+                <time dateTime={article.published_at ?? undefined}>
+                  {formatDateLong(article.published_at)}
+                </time>
+                <span aria-hidden="true">&middot;</span>
+                <span>{article.read_time} min read</span>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Article body — serif prose with drop cap */}
-      <div className="article-prose">
-        {article.content.split('\n\n').map((paragraph, index) => (
-          <p key={index} className={index === 0 ? 'drop-cap' : undefined}>
-            {paragraph}
-          </p>
-        ))}
+        {/* Article body — Markdown rendered */}
+        <ArticleContent content={article.content} />
+
+        {/* Separator */}
+        <hr className="border-t border-border my-[var(--section-gap-mobile)] md:my-[var(--section-gap)]" />
+
+        {/* Comments Section */}
+        <CommentsSection slug={slug} />
       </div>
-
-      {/* Separator */}
-      <hr className="border-t border-border my-12 md:my-16" />
-
-      {/* Comments Section */}
-      <CommentsSection slug={slug} />
     </article>
   );
 }
