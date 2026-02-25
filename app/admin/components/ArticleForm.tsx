@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import type { Article } from '@/types/article';
 
@@ -60,6 +60,8 @@ export function ArticleForm({ article, onSave, onCancel }: ArticleFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [draggingContent, setDraggingContent] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   async function uploadFile(file: File): Promise<string | null> {
     const formData = new FormData();
@@ -149,6 +151,44 @@ export function ArticleForm({ article, onSave, onCancel }: ArticleFormProps) {
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '');
       updateField('slug', autoSlug);
+    }
+  }
+
+  function insertTextAtCursor(textarea: HTMLTextAreaElement, text: string) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = textarea.value.substring(0, start);
+    const after = textarea.value.substring(end);
+    const newValue = before + text + after;
+    updateField('content', newValue);
+    // Restore cursor position after the inserted text
+    requestAnimationFrame(() => {
+      textarea.selectionStart = textarea.selectionEnd = start + text.length;
+      textarea.focus();
+    });
+  }
+
+  async function handleContentImageUpload(file: File) {
+    const textarea = contentRef.current;
+    if (!textarea) return;
+
+    // Insert placeholder at cursor
+    const placeholder = `![Uploading ${file.name}...](uploading)`;
+    insertTextAtCursor(textarea, placeholder);
+
+    try {
+      const url = await uploadFile(file);
+      if (url) {
+        // Replace placeholder with real URL
+        const current = form.content;
+        const markdown = `![${file.name}](${url})`;
+        updateField('content', current.replace(placeholder, markdown));
+      }
+    } catch (err) {
+      // Replace placeholder with error
+      const current = form.content;
+      updateField('content', current.replace(placeholder, ''));
+      setError(err instanceof Error ? err.message : 'Image upload failed');
     }
   }
 
@@ -305,14 +345,38 @@ export function ArticleForm({ article, onSave, onCancel }: ArticleFormProps) {
           </label>
           <textarea
             id="content"
+            ref={contentRef}
             value={form.content}
             onChange={(e) => updateField('content', e.target.value)}
             rows={10}
             className={cn(
               'w-full px-3 py-2 rounded-lg border bg-background text-foreground text-sm font-mono resize-y min-h-[240px] md:min-h-[400px]',
-              fieldErrors.content ? 'border-destructive' : 'border-border'
+              fieldErrors.content ? 'border-destructive' :
+                draggingContent ? 'border-accent' : 'border-border'
             )}
             placeholder="Article content in Markdown"
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDraggingContent(true);
+            }}
+            onDragLeave={() => setDraggingContent(false)}
+            onDrop={async (e) => {
+              setDraggingContent(false);
+              const file = Array.from(e.dataTransfer.files).find(f => f.type.startsWith('image/'));
+              if (file) {
+                e.preventDefault();
+                handleContentImageUpload(file);
+              }
+            }}
+            onPaste={async (e) => {
+              const items = Array.from(e.clipboardData.items);
+              const imageItem = items.find(item => item.type.startsWith('image/'));
+              if (imageItem) {
+                e.preventDefault();
+                const file = imageItem.getAsFile();
+                if (file) handleContentImageUpload(file);
+              }
+            }}
           />
           {fieldErrors.content && (
             <p className="mt-1 text-xs text-destructive">{fieldErrors.content}</p>
