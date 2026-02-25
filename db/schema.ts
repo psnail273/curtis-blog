@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, integer, text, timestamp, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, varchar, integer, text, timestamp, jsonb, index } from 'drizzle-orm/pg-core'
 
 export const files = pgTable('files', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -50,10 +50,15 @@ export const comments = pgTable('comments', {
   id: uuid('id').primaryKey().defaultRandom(),
   articleId: uuid('article_id').notNull().references(() => articles.id, { onDelete: 'cascade' }),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  parentId: uuid('parent_id'),
   content: text('content').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-})
+}, (table) => [
+  index('idx_comments_article_id').on(table.articleId, table.createdAt.asc()),
+  index('idx_comments_user_id').on(table.userId),
+  index('idx_comments_parent_id').on(table.parentId),
+])
 
 export const commentLikes = pgTable('comment_likes', {
   id: uuid('id').primaryKey().defaultRandom(),
