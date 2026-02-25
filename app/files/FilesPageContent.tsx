@@ -69,7 +69,7 @@ export function FilesPageContent() {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto pb-16">
+    <div className="pb-16">
       {/* Page Header */}
       <header className="mb-12 md:mb-16 border-l-4 border-accent pl-6">
         <h1 className="mb-4">Files</h1>

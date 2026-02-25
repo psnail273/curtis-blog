@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const sql = getDb();
     const rows = await sql`
-      SELECT id, slug, title, excerpt, content, author, published_at, category, read_time, cover_image, status, created_at, updated_at, pinned, pinned_at
+      SELECT id, slug, title, excerpt, content, author, published_at, category, read_time, cover_image, status, created_at, updated_at
       FROM articles
       WHERE status = 'published'
       ORDER BY published_at DESC

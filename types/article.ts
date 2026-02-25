@@ -5,15 +5,13 @@ export interface Article {
   excerpt: string;
   content: string;
   author: string;
-  publishedAt: string;
+  publishedAt: string | null;
   category: string;
   readTime: number;
   coverImage?: string;
   status?: 'draft' | 'published';
   createdAt?: string;
   updatedAt?: string;
-  pinned?: boolean;
-  pinnedAt?: string;
 }
 
 export interface AboutPageSection {

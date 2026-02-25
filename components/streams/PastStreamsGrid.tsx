@@ -2,69 +2,48 @@
 
 import { useState, useEffect } from 'react';
 import { StreamCard } from './StreamCard';
+import type { PastStream } from '@/lib/services/stream-utils';
 
-interface PastStream {
-  id: string;
-  title: string;
-  url: string;
-  thumbnailUrl: string;
-  duration: string;
-  viewCount: number;
-  createdAt: string;
-  platform: 'twitch' | 'youtube';
+interface PastStreamsGridProps {
+  initialStreams: PastStream[];
 }
 
-export function PastStreamsGrid() {
-  const [streams, setStreams] = useState<PastStream[]>([]);
-  const [loading, setLoading] = useState(true);
+export function PastStreamsGrid({ initialStreams }: PastStreamsGridProps) {
+  const [streams, setStreams] = useState<PastStream[]>(initialStreams);
+  const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [twitchCursor, setTwitchCursor] = useState<string | null>(null);
-  const [youtubePageToken, setYoutubePageToken] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(initialStreams.length >= 12);
 
-  async function fetchStreams(loadMore = false) {
-    if (loadMore) {
-      setLoadingMore(true);
-    } else {
-      setLoading(true);
-    }
+  // If DB was empty on server render, try fetching client-side (triggers after() refresh)
+  useEffect(() => {
+    if (initialStreams.length > 0) return;
 
+    setLoading(true);
+    fetch('/api/streams')
+      .then(res => res.json())
+      .then(data => {
+        setStreams(data.streams ?? []);
+        setHasMore(data.hasMore ?? false);
+      })
+      .catch(err => console.error('Failed to fetch streams:', err))
+      .finally(() => setLoading(false));
+  }, [initialStreams.length]);
+
+  async function handleLoadMore() {
+    setLoadingMore(true);
     try {
-      // Fetch from both platforms in parallel
-      const [twitchRes, youtubeRes] = await Promise.all([
-        fetch(`/api/streams/twitch${loadMore && twitchCursor ? `?cursor=${twitchCursor}` : ''}`).catch(() => null),
-        fetch(`/api/streams/youtube${loadMore && youtubePageToken ? `?pageToken=${youtubePageToken}` : ''}`).catch(() => null),
-      ]);
-
-      const twitchData = twitchRes?.ok ? await twitchRes.json() : { streams: [], cursor: null };
-      const youtubeData = youtubeRes?.ok ? await youtubeRes.json() : { streams: [], pageToken: null };
-
-      // Merge and sort by date
-      const newStreams = [...twitchData.streams, ...youtubeData.streams].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-
-      setStreams(prev => loadMore ? [...prev, ...newStreams] : newStreams);
-      setTwitchCursor(twitchData.cursor);
-      setYoutubePageToken(youtubeData.pageToken);
-      setHasMore(twitchData.cursor !== null || youtubeData.pageToken !== null);
+      const res = await fetch(`/api/streams?offset=${streams.length}`);
+      const data = await res.json();
+      setStreams(prev => [...prev, ...(data.streams ?? [])]);
+      setHasMore(data.hasMore ?? false);
     } catch (error) {
-      console.error('Failed to fetch past streams:', error);
+      console.error('Failed to load more streams:', error);
     } finally {
-      setLoading(false);
       setLoadingMore(false);
     }
   }
 
-  // Initial load
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchStreams(); }, []);
-
-  function handleLoadMore() {
-    fetchStreams(true);
-  }
-
-  // Loading state
+  // Loading state (only on cold start when DB is empty)
   if (loading) {
     return (
       <section className="mt-12 md:mt-16">
@@ -107,14 +86,12 @@ export function PastStreamsGrid() {
         Past Streams
       </h2>
 
-      {/* Grid of stream cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {streams.map((stream) => (
           <StreamCard key={`${stream.platform}-${stream.id}`} stream={stream} />
         ))}
       </div>
 
-      {/* Load more button */}
       {hasMore && (
         <div className="mt-8 text-center">
           <button

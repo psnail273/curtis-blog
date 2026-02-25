@@ -1,4 +1,4 @@
-import type { FileType } from '@/types/file';
+import type { FileType, FileRow, FileRecord } from '@/types/file';
 
 /**
  * Extension-to-FileType mapping for common file formats.
@@ -86,6 +86,23 @@ const MIME_PREFIX_MAP: [string, FileType][] = [
   ['application/vnd.openxmlformats', 'document'],
   ['application/vnd.ms-', 'document'],
 ];
+
+/**
+ * Map a database row (snake_case) to a FileRecord (camelCase).
+ */
+export function toFileRecord(row: FileRow): FileRecord {
+  return {
+    id: row.id,
+    name: row.name,
+    path: row.path,
+    type: row.type,
+    size: row.size,
+    uploadDate: row.upload_date,
+    description: row.description,
+    url: row.url,
+    metadata: row.metadata,
+  };
+}
 
 /**
  * Detect the FileType category from a filename and MIME type.

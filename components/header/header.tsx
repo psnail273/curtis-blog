@@ -9,6 +9,30 @@ import { SearchTrigger } from '@/components/search/SearchTrigger';
 import HamburgerButton from './hamburgerButton/HamburgerButton';
 import MobileNav from './mobileNav/MobileNav';
 
+function NavLink({
+  href,
+  isActive,
+  children,
+}: {
+  href: string;
+  isActive: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+        'transition-colors duration-200',
+        isActive ? 'text-accent font-bold' : 'text-secondary hover:text-accent'
+      )}
+      aria-current={isActive ? 'page' : undefined}
+    >
+      {children}
+    </Link>
+  );
+}
+
 interface HeaderProps {
   categories: string[];
 }
@@ -64,43 +88,24 @@ export default function Header({ categories }: HeaderProps) {
         {/* Bottom Tier: Navigation Bar (desktop only) */}
         <div className="hidden lg:flex items-center justify-center relative border-t border-border px-4 md:px-8">
           <nav className="flex items-center gap-6 py-3" aria-label="Main navigation">
-            {/* All link */}
-            <Link
-              href="/"
-              className={cn(
-                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
-                'transition-colors duration-200',
-                activeCategory === null && pathname === '/'
-                  ? 'text-accent font-bold'
-                  : 'text-secondary hover:text-accent'
-              )}
-              aria-current={activeCategory === null && pathname === '/' ? 'page' : undefined}
-            >
+            <NavLink href="/" isActive={activeCategory === null && pathname === '/'}>
               All
-            </Link>
+            </NavLink>
 
-            {/* Category links */}
             {categories.map((category) => (
-              <Link
+              <NavLink
                 key={category}
                 href={`/?category=${encodeURIComponent(category)}`}
-                className={cn(
-                  'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
-                  'transition-colors duration-200',
-                  activeCategory === category
-                    ? 'text-accent font-bold'
-                    : 'text-secondary hover:text-accent'
-                )}
-                aria-current={activeCategory === category ? 'page' : undefined}
+                isActive={activeCategory === category}
               >
                 {category}
-              </Link>
+              </NavLink>
             ))}
 
             {/* Divider */}
             <div className="w-px h-5 bg-border" aria-hidden="true" />
 
-            {/* Streams link (NEW) */}
+            {/* Streams link — special case with live pulse animation */}
             <Link
               href="/streams"
               className={cn(
@@ -122,50 +127,9 @@ export default function Header({ categories }: HeaderProps) {
               </span>
             </Link>
 
-            {/* About link */}
-            <Link
-              href="/about"
-              className={cn(
-                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
-                'transition-colors duration-200',
-                pathname === '/about'
-                  ? 'text-accent font-bold'
-                  : 'text-secondary hover:text-accent'
-              )}
-              aria-current={pathname === '/about' ? 'page' : undefined}
-            >
-              About
-            </Link>
-
-            {/* Files link */}
-            <Link
-              href="/files"
-              className={cn(
-                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
-                'transition-colors duration-200',
-                pathname === '/files'
-                  ? 'text-accent font-bold'
-                  : 'text-secondary hover:text-accent'
-              )}
-              aria-current={pathname === '/files' ? 'page' : undefined}
-            >
-              Files
-            </Link>
-
-            {/* Support link */}
-            <Link
-              href="/support"
-              className={cn(
-                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
-                'transition-colors duration-200',
-                pathname === '/support'
-                  ? 'text-accent font-bold'
-                  : 'text-secondary hover:text-accent'
-              )}
-              aria-current={pathname === '/support' ? 'page' : undefined}
-            >
-              Support
-            </Link>
+            <NavLink href="/about" isActive={pathname === '/about'}>About</NavLink>
+            <NavLink href="/files" isActive={pathname === '/files'}>Files</NavLink>
+            <NavLink href="/support" isActive={pathname === '/support'}>Support</NavLink>
           </nav>
 
           {/* Search trigger on right */}

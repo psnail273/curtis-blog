@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowRight } from 'lucide-react';
 import { useLiveStatus, type StreamConfig } from '@/contexts/LiveStatusContext';
 import { cn } from '@/lib/utils';
 import type { StreamStatus } from '@/contexts/LiveStatusContext';
@@ -32,13 +33,6 @@ function PlatformIcon({ platform, className }: { platform: string; className?: s
   );
 }
 
-function ArrowIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-    </svg>
-  );
-}
 
 function LiveStreamCard({ stream, streamStatus }: { stream: StreamConfig; streamStatus?: StreamStatus }) {
   const platformName = getPlatformName(stream.platform);
@@ -84,7 +78,7 @@ function LiveStreamCard({ stream, streamStatus }: { stream: StreamConfig; stream
         className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent-hover transition-colors"
       >
         Watch on {platformName}
-        <ArrowIcon />
+        <ArrowRight size={20} aria-hidden="true" />
       </a>
     </div>
   );
@@ -117,13 +111,20 @@ function OfflineStreamCard({ stream }: { stream: StreamConfig }) {
 export function StreamHero() {
   const { status, streams, isLoading } = useLiveStatus();
 
-  // Loading state
+  // No streams configured
+  if (streams.length === 0) return null;
+
+  // Loading state — only shown when streams are configured (avoids
+  // hydration mismatch when server renders null but client renders skeletons)
   if (isLoading) {
     return (
       <section className="mb-8 md:mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1, 2].map((i) => (
-            <div key={i} className="py-6 md:py-8 px-6 md:px-8 border border-border rounded-lg bg-muted/20 animate-pulse">
+        <div className={cn(
+          'grid gap-4',
+          streams.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'
+        )}>
+          {streams.map((stream) => (
+            <div key={`${stream.platform}:${stream.username}`} className="py-6 md:py-8 px-6 md:px-8 border border-border rounded-lg bg-muted/20 animate-pulse">
               <div className="h-6 bg-muted/40 rounded w-32 mx-auto mb-4" />
               <div className="h-4 bg-muted/40 rounded w-48 mx-auto" />
             </div>
@@ -132,9 +133,6 @@ export function StreamHero() {
       </section>
     );
   }
-
-  // No streams configured
-  if (streams.length === 0) return null;
 
   return (
     <section

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { type ArticleRow, toArticle } from '@/lib/article-utils';
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { UUID_REGEX } from '@/lib/validation';
+import { requireAdminAuth } from '@/lib/admin-auth';
 
 /**
  * GET /api/admin/articles/[id]
@@ -14,6 +15,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const { id } = await params;
 
@@ -57,6 +60,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const { id } = await params;
 
@@ -68,6 +73,26 @@ export async function PATCH(
     }
 
     const body = await request.json();
+
+    // Validate field lengths for provided fields
+    if (body.title !== undefined && body.title.length > 500) {
+      return NextResponse.json({ error: 'Title must be 500 characters or fewer' }, { status: 400 });
+    }
+    if (body.slug !== undefined && body.slug.length > 255) {
+      return NextResponse.json({ error: 'Slug must be 255 characters or fewer' }, { status: 400 });
+    }
+    if (body.excerpt !== undefined && body.excerpt.length > 1000) {
+      return NextResponse.json({ error: 'Excerpt must be 1000 characters or fewer' }, { status: 400 });
+    }
+    if (body.content !== undefined && body.content.length > 100000) {
+      return NextResponse.json({ error: 'Content must be 100,000 characters or fewer' }, { status: 400 });
+    }
+    if (body.category !== undefined && body.category.length > 100) {
+      return NextResponse.json({ error: 'Category must be 100 characters or fewer' }, { status: 400 });
+    }
+    if (body.author !== undefined && body.author.length > 255) {
+      return NextResponse.json({ error: 'Author must be 255 characters or fewer' }, { status: 400 });
+    }
 
     // Fetch current article to check if it exists and get current values
     const existing = await sql`
@@ -94,14 +119,6 @@ export async function PATCH(
     const author = body.author ?? current.author;
     const coverImage = body.coverImage !== undefined ? body.coverImage : current.cover_image;
 
-    // Handle pinned toggle - set pinned_at when pinning, clear when unpinning
-    let pinned = current.pinned;
-    let pinnedAt = current.pinned_at;
-    if (body.pinned !== undefined) {
-      pinned = Boolean(body.pinned);
-      pinnedAt = pinned ? new Date().toISOString() : null;
-    }
-
     // If transitioning from draft to published, set publishedAt to now
     let publishedAt = current.published_at;
     if (status === 'published' && current.status === 'draft') {
@@ -127,8 +144,6 @@ export async function PATCH(
         status = ${status},
         author = ${author},
         published_at = ${publishedAt},
-        pinned = ${pinned},
-        pinned_at = ${pinnedAt},
         updated_at = ${now}
       WHERE id = ${id}
       RETURNING *
@@ -139,6 +154,13 @@ export async function PATCH(
         { error: 'Failed to update article' },
         { status: 500 }
       );
+    }
+
+    // Revalidate the updated article page
+    revalidatePath(`/articles/${rows[0].slug}`);
+    // If the slug changed, also revalidate the old slug's cached page
+    if (current.slug !== rows[0].slug) {
+      revalidatePath(`/articles/${current.slug}`);
     }
 
     return NextResponse.json(toArticle(rows[0]));
@@ -168,6 +190,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const { id } = await params;
 
@@ -178,18 +202,27 @@ export async function DELETE(
       );
     }
 
-    const rows = await sql`
-      DELETE FROM articles WHERE id = ${id} RETURNING id
-    ` as { id: string }[];
+    // Fetch slug before deletion so we can revalidate the cached page
+    const toDelete = await sql`
+      SELECT id, slug FROM articles WHERE id = ${id}
+    ` as { id: string; slug: string }[];
 
-    if (rows.length === 0) {
+    if (toDelete.length === 0) {
       return NextResponse.json(
         { error: 'Article not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, id: rows[0].id });
+    const deletedSlug = toDelete[0].slug;
+
+    await sql`
+      DELETE FROM articles WHERE id = ${id}
+    `;
+
+    revalidatePath(`/articles/${deletedSlug}`);
+
+    return NextResponse.json({ success: true, id: toDelete[0].id });
   } catch (error) {
     console.error('Error deleting article:', error);
     return NextResponse.json(

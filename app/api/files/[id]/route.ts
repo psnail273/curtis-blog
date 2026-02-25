@@ -1,28 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { toFileRecord } from '@/lib/file-utils';
+import { UUID_REGEX } from '@/lib/validation';
 import { FileRecord, FileRow } from '@/types/file';
-
-/**
- * UUID v4 format regex for validation.
- */
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/**
- * Map a database row (snake_case) to a FileRecord (camelCase).
- */
-function toFileRecord(row: FileRow): FileRecord {
-  return {
-    id: row.id,
-    name: row.name,
-    path: row.path,
-    type: row.type,
-    size: row.size,
-    uploadDate: row.upload_date,
-    description: row.description,
-    url: row.url,
-    metadata: row.metadata,
-  };
-}
 
 /**
  * GET /api/files/[id]

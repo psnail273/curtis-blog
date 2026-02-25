@@ -1,26 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { del } from '@vercel/blob';
 import { getDb } from '@/lib/db';
+import { toFileRecord } from '@/lib/file-utils';
+import { UUID_REGEX } from '@/lib/validation';
 import type { FileRow } from '@/types/file';
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/**
- * Map a database row (snake_case) to a FileRecord (camelCase).
- */
-function toFileRecord(row: FileRow) {
-  return {
-    id: row.id,
-    name: row.name,
-    path: row.path,
-    type: row.type,
-    size: row.size,
-    uploadDate: row.upload_date,
-    description: row.description,
-    url: row.url,
-    metadata: row.metadata,
-  };
-}
+import { requireAdminAuth } from '@/lib/admin-auth';
 
 /**
  * PATCH /api/admin/files/[id]
@@ -33,6 +17,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const { id } = await params;
 
@@ -110,6 +96,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const { id } = await params;
 

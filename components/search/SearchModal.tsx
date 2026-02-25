@@ -53,18 +53,15 @@ export function SearchModal({ onClose }: SearchModalProps) {
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
-      const [articlesRes, filesRes, twitchRes, youtubeRes] = await Promise.all([
+      const [articlesRes, filesRes, streamsRes] = await Promise.all([
         fetch('/api/articles').then((r) => r.ok ? r.json() : []).catch(() => []),
         fetch('/api/files').then((r) => r.ok ? r.json() : []).catch(() => []),
-        fetch('/api/streams/twitch').then((r) => r.ok ? r.json() : { streams: [] }).catch(() => ({ streams: [] })),
-        fetch('/api/streams/youtube').then((r) => r.ok ? r.json() : { streams: [] }).catch(() => ({ streams: [] })),
+        fetch('/api/streams').then((r) => r.ok ? r.json() : { streams: [] }).catch(() => ({ streams: [] })),
       ]);
 
       setAllArticles(Array.isArray(articlesRes) ? articlesRes : []);
       setAllFiles(Array.isArray(filesRes) ? filesRes : []);
-      const twitchStreams: PastStream[] = twitchRes?.streams ?? [];
-      const youtubeStreams: PastStream[] = youtubeRes?.streams ?? [];
-      setAllStreams([...twitchStreams, ...youtubeStreams]);
+      setAllStreams(streamsRes?.streams ?? []);
       setIsLoading(false);
     }
 
@@ -195,7 +192,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-xl mx-auto mt-[15vh] px-4">
+      <div className="relative z-10 w-full max-w-xl mx-auto mt-[10vh] sm:mt-[15vh] px-4">
         <div
           ref={modalRef}
           role="dialog"

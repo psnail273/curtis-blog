@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { formatDateShort } from '@/lib/format-utils';
 
 interface StreamCardProps {
   stream: {
@@ -11,18 +12,6 @@ interface StreamCardProps {
     createdAt: string;
     platform: 'twitch' | 'youtube';
   };
-}
-
-function formatDate(dateString: string): string {
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
 }
 
 function formatViewCount(count: number): string {
@@ -41,7 +30,7 @@ export function StreamCard({ stream }: StreamCardProps) {
       href={stream.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`Watch ${stream.title} from ${formatDate(stream.createdAt)}`}
+      aria-label={`Watch ${stream.title} from ${formatDateShort(stream.createdAt)}`}
       className="block group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <article className="border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-warm-hover hover:-translate-y-1 bg-card">
@@ -93,7 +82,7 @@ export function StreamCard({ stream }: StreamCardProps) {
 
           {/* Metadata */}
           <p className="text-sm text-muted">
-            {formatDate(stream.createdAt)} &middot; {formatViewCount(stream.viewCount)} views
+            {formatDateShort(stream.createdAt)} &middot; {formatViewCount(stream.viewCount)} views
           </p>
         </div>
       </article>

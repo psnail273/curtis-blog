@@ -3,6 +3,7 @@
 import { memo, useRef, useEffect } from 'react';
 import { FileText, Video, File } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getCategoryStyle } from '@/lib/category-colors';
 import type { SearchResult, PastStream } from '@/types/search';
 import type { Article } from '@/types/article';
 import type { FileRecord } from '@/types/file';
@@ -22,7 +23,10 @@ function ArticleContent({ data }: { data: Article }) {
           {data.title}
         </div>
         <div className="flex items-center gap-2 mt-1 text-xs">
-          <span className="search-category-badge px-1.5 py-0.5 text-accent rounded font-medium">
+          <span
+            className="category-bg category-color px-1.5 py-0.5 rounded font-medium"
+            style={getCategoryStyle(data.category)}
+          >
             {data.category}
           </span>
           <span className="text-muted">{data.readTime} min read</span>

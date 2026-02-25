@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getDb } from '@/lib/db';
+import { requireAdminAuth } from '@/lib/admin-auth';
 
 interface AboutRow {
   id: string;
@@ -48,6 +50,8 @@ function consolidateSections(rows: AboutRow[]): string {
  */
 export async function GET() {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const rows = await sql`
       SELECT * FROM about_page ORDER BY "order" ASC
@@ -98,6 +102,8 @@ export async function GET() {
  */
 export async function PATCH(request: NextRequest) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const body = await request.json();
 
@@ -142,6 +148,9 @@ export async function PATCH(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Revalidate the about page (it uses revalidate = 60)
+    revalidatePath('/about');
 
     return NextResponse.json({
       content: rows[0].content,

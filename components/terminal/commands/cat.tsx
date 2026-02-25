@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import Link from 'next/link';
 import { AsyncCommandOutput } from '../AsyncCommandOutput';
 import { fetchFileByName } from '../utils/fileApi';
 import { resolveFileType, formatFileSize, resolvePath, pathToArg } from '../utils/paths';
@@ -154,12 +155,12 @@ function CatArticlesAsync() {
       return (
         <div className="space-y-5">
           {articles.map((article) => {
-            const date = new Date(article.publishedAt);
-            const formattedDate = date.toLocaleDateString('en-US', {
+            const date = article.publishedAt ? new Date(article.publishedAt) : null;
+            const formattedDate = date ? date.toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
-            });
+            }) : '';
 
             return (
               <div key={article.id} className="border-l-2 border-accent pl-3 space-y-1">
@@ -174,12 +175,12 @@ function CatArticlesAsync() {
                   <span className="text-muted">{article.readTime} min read</span>
                 </div>
                 <p className="text-body mt-2">{article.excerpt}</p>
-                <a
+                <Link
                   href={`/articles/${article.slug}`}
                   className="text-accent hover:underline text-sm inline-block mt-1"
                 >
                   Read full article &rarr;
-                </a>
+                </Link>
               </div>
             );
           })}
@@ -209,12 +210,12 @@ function CatArticleAsync({ slug }: { slug: string }) {
       }
       const article: Article = await res.json();
 
-      const date = new Date(article.publishedAt);
-      const formattedDate = date.toLocaleDateString('en-US', {
+      const date = article.publishedAt ? new Date(article.publishedAt) : null;
+      const formattedDate = date ? date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-      });
+      }) : '';
 
       return (
         <div className="space-y-3">
@@ -230,12 +231,12 @@ function CatArticleAsync({ slug }: { slug: string }) {
           <div className="text-muted mt-4">
             [Content preview truncated. Read full article at /articles/{article.slug}]
           </div>
-          <a
+          <Link
             href={`/articles/${article.slug}`}
             className="text-accent hover:underline inline-block mt-2"
           >
             Read full article &rarr;
-          </a>
+          </Link>
         </div>
       );
     } catch {

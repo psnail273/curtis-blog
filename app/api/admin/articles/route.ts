@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { type ArticleRow, toArticle } from '@/lib/article-utils';
+import { requireAdminAuth } from '@/lib/admin-auth';
 
 /**
  * GET /api/admin/articles
@@ -9,6 +11,8 @@ import { type ArticleRow, toArticle } from '@/lib/article-utils';
  */
 export async function GET() {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const rows = await sql`
       SELECT * FROM articles ORDER BY created_at DESC
@@ -33,6 +37,8 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const body = await request.json();
 
@@ -52,6 +58,26 @@ export async function POST(request: NextRequest) {
         { error: `Missing required fields: ${missing.join(', ')}` },
         { status: 400 }
       );
+    }
+
+    // Validate field lengths
+    if (title.length > 500) {
+      return NextResponse.json({ error: 'Title must be 500 characters or fewer' }, { status: 400 });
+    }
+    if (slug.length > 255) {
+      return NextResponse.json({ error: 'Slug must be 255 characters or fewer' }, { status: 400 });
+    }
+    if (excerpt.length > 1000) {
+      return NextResponse.json({ error: 'Excerpt must be 1000 characters or fewer' }, { status: 400 });
+    }
+    if (content.length > 100000) {
+      return NextResponse.json({ error: 'Content must be 100,000 characters or fewer' }, { status: 400 });
+    }
+    if (category.length > 100) {
+      return NextResponse.json({ error: 'Category must be 100 characters or fewer' }, { status: 400 });
+    }
+    if (author && author.length > 255) {
+      return NextResponse.json({ error: 'Author must be 255 characters or fewer' }, { status: 400 });
     }
 
     // Validate slug format (lowercase letters, numbers, hyphens)
@@ -91,6 +117,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Revalidate the new article's page so ISR picks it up
+    revalidatePath(`/articles/${rows[0].slug}`);
 
     return NextResponse.json(toArticle(rows[0]), { status: 201 });
   } catch (error: unknown) {

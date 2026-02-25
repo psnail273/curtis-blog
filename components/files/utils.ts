@@ -2,16 +2,10 @@
  * Shared utility functions for file components.
  */
 
+import { formatDateLong, formatDateShort } from '@/lib/format-utils';
+
 export function formatDate(dateString: string, format: 'long' | 'short' = 'long'): string {
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: format,
-      day: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
+  return format === 'long' ? formatDateLong(dateString) : formatDateShort(dateString);
 }
 
 export function formatFileSize(bytes: number): string {

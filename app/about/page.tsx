@@ -53,11 +53,11 @@ export default async function About() {
 
       {/* Markdown Content */}
       {content ? (
-        <section className="max-w-3xl">
+        <section>
           <AboutPageMarkdown content={content} />
         </section>
       ) : (
-        <section className="max-w-3xl">
+        <section>
           <p className="text-muted">About page content coming soon.</p>
         </section>
       )}

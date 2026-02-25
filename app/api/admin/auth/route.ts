@@ -12,6 +12,12 @@ import {
  * Login endpoint. Validates password against ADMIN_PASSWORD env var.
  * On success, sets an HTTP-only session cookie.
  * Body: { password: string }
+ *
+ * Rate limiting: NOT implemented in-memory. On Vercel serverless, each function
+ * instance has its own memory — concurrent requests route to different instances,
+ * each with a fresh counter. In-memory rate limiting creates false security.
+ * The HMAC-signed HTTP-only session cookie is the primary protection.
+ * If real rate limiting is needed, use Vercel KV (Redis).
  */
 export async function POST(request: NextRequest) {
   try {

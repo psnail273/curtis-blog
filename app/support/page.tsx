@@ -28,7 +28,7 @@ export default function Support() {
         </p>
       </section>
 
-      <section className="max-w-3xl space-y-8">
+      <section className="space-y-8">
         <div className="space-y-4">
           <h2>Why support matters</h2>
           <p className="text-lg leading-relaxed text-body">
@@ -74,7 +74,7 @@ export default function Support() {
         </div>
       </section>
 
-      <section className="max-w-3xl">
+      <section>
         <div className="border-t border-border pt-12 space-y-4">
           <h2>What&apos;s ahead</h2>
           <p className="leading-relaxed text-body">

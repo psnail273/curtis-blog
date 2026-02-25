@@ -2,56 +2,42 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Article } from '@/types/article';
 import { cn } from '@/lib/utils';
-import { getCategoryColor } from '@/lib/category-colors';
+import { getCategoryStyle } from '@/lib/category-colors';
+import { formatDateLong } from '@/lib/format-utils';
 
 interface MosaicCardProps {
   article: Article;
   size: 'hero' | 'medium' | 'small';
   priority?: boolean;
   showCategory?: boolean;
+  featured?: boolean;
+  className?: string;
 }
 
-function formatDate(dateString: string): string {
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
-
-export function MosaicCard({ article, size, priority = false, showCategory = true }: MosaicCardProps) {
-  const catColor = getCategoryColor(article.category);
-
+export function MosaicCard({ article, size, priority = false, showCategory = true, featured = false, className }: MosaicCardProps) {
   return (
     <Link
       href={`/articles/${article.slug}`}
       aria-label={`Read article: ${article.title}`}
-      className="block h-full group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className={cn("block h-full group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring", className)}
     >
       <article
         className={cn(
           'relative h-full flex flex-col border border-border rounded-lg overflow-hidden',
-          'transition-all duration-200',
-          'hover:shadow-warm-hover hover:-translate-y-1',
-          'bg-card'
+          'transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+          'hover:shadow-warm-hover',
+          'bg-card category-hover-border',
+          featured && 'category-glow-static'
         )}
-        style={{
-          '--hover-border': catColor.light,
-        } as React.CSSProperties}
-        onMouseEnter={e => (e.currentTarget.style.borderColor = catColor.light)}
-        onMouseLeave={e => (e.currentTarget.style.borderColor = '')}
+        style={getCategoryStyle(article.category)}
       >
         {/* Cover Image - all sizes when available */}
         {article.coverImage && (
           <div className={cn(
             'relative w-full shrink-0',
             size === 'hero' ? 'aspect-[16/9]' :
-              size === 'medium' ? 'aspect-[4/3] h-32 md:h-40' :
-                'aspect-[3/2] h-24 md:h-28'
+              size === 'medium' ? 'aspect-[4/3]' :
+                'aspect-[3/2]'
           )}>
             <Image
               src={article.coverImage}
@@ -77,18 +63,6 @@ export function MosaicCard({ article, size, priority = false, showCategory = tru
             size === 'medium' ? 'p-5 md:p-6 space-y-3 md:space-y-4' :
               'p-4 md:p-5 space-y-2.5'
         )}>
-          {/* Category badge — only shown in hero mosaic */}
-          {showCategory && (
-            <span
-              className="px-2.5 py-1 rounded-md text-xs font-medium uppercase tracking-wide w-fit"
-              style={{
-                backgroundColor: catColor.bgLight,
-                color: catColor.light,
-              }}
-            >
-              {article.category}
-            </span>
-          )}
 
           {/* Title */}
           <h3
@@ -119,15 +93,31 @@ export function MosaicCard({ article, size, priority = false, showCategory = tru
             'flex items-center gap-2 flex-wrap text-caption mt-auto',
             size === 'hero' ? 'text-sm' : 'text-xs'
           )}>
+            {showCategory && (
+              <>
+                <span className="category-bg category-color px-1.5 py-0.5 rounded text-xs font-medium uppercase tracking-wide">
+                  {article.category}
+                </span>
+                <span aria-hidden="true">&middot;</span>
+              </>
+            )}
             <span className="font-semibold text-foreground/80">{article.author}</span>
             <span aria-hidden="true">&middot;</span>
-            <time dateTime={article.publishedAt}>
-              {formatDate(article.publishedAt)}
+            <time dateTime={article.publishedAt ?? undefined}>
+              {formatDateLong(article.publishedAt)}
             </time>
             {size !== 'small' && (
               <>
                 <span aria-hidden="true">&middot;</span>
                 <span>{article.readTime} min read</span>
+              </>
+            )}
+            {article.status === 'draft' && (
+              <>
+                <span aria-hidden="true">&middot;</span>
+                <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 px-1.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+                  Draft
+                </span>
               </>
             )}
           </div>

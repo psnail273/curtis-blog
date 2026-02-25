@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow auth endpoints through without verification
-  if (pathname.startsWith('/api/admin/auth')) {
+  if (pathname === '/api/admin/auth') {
     return NextResponse.next();
   }
 

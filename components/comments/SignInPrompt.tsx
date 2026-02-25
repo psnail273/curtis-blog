@@ -14,7 +14,7 @@ export function SignInPrompt() {
         Sign in with your Google account to comment and interact with other readers.
       </p>
       <button
-        onClick={() => signIn('google')}
+        onClick={() => signIn('google', { callbackUrl: window.location.href })}
         className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent-hover transition-colors duration-200 mx-auto"
       >
         <svg

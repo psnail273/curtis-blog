@@ -33,7 +33,7 @@ interface LiveStatusContextValue {
 
 const LiveStatusContext = createContext<LiveStatusContextValue | undefined>(undefined);
 
-const POLL_INTERVAL = 60 * 1000; // 60 seconds
+const POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 interface LiveStatusProviderProps {
   streams: StreamConfig[];

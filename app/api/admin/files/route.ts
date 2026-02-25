@@ -1,25 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { put, del } from '@vercel/blob';
 import { getDb } from '@/lib/db';
-import { detectFileType } from '@/lib/file-utils';
-import type { FileRow, FileRecord } from '@/types/file';
-
-/**
- * Map a database row (snake_case) to a FileRecord (camelCase).
- */
-function toFileRecord(row: FileRow): FileRecord {
-  return {
-    id: row.id,
-    name: row.name,
-    path: row.path,
-    type: row.type,
-    size: row.size,
-    uploadDate: row.upload_date,
-    description: row.description,
-    url: row.url,
-    metadata: row.metadata,
-  };
-}
+import { detectFileType, toFileRecord } from '@/lib/file-utils';
+import type { FileRow } from '@/types/file';
+import { requireAdminAuth } from '@/lib/admin-auth';
 
 /**
  * GET /api/admin/files
@@ -28,6 +12,8 @@ function toFileRecord(row: FileRow): FileRecord {
  */
 export async function GET() {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const sql = getDb();
     const rows = await sql`
       SELECT * FROM files ORDER BY upload_date DESC
@@ -54,6 +40,8 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const authError = await requireAdminAuth();
+    if (authError) return authError;
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const description = formData.get('description') as string | null;
@@ -77,6 +65,24 @@ export async function POST(request: NextRequest) {
     if (file.size === 0) {
       return NextResponse.json(
         { error: 'File is empty. Please select a valid file.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate filename length
+    if (file.name.length > 255) {
+      return NextResponse.json(
+        { error: 'Filename must be 255 characters or fewer.' },
+        { status: 400 }
+      );
+    }
+
+    // Block dangerous executable file types
+    const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.com', '.msi', '.php', '.phtml', '.asp', '.aspx', '.jsp', '.cgi'];
+    const fileExt = file.name.includes('.') ? '.' + file.name.split('.').pop()!.toLowerCase() : '';
+    if (BLOCKED_EXTENSIONS.includes(fileExt)) {
+      return NextResponse.json(
+        { error: `File type '${fileExt}' is not allowed for security reasons.` },
         { status: 400 }
       );
     }

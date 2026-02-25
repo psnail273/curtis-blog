@@ -14,25 +14,25 @@ export function HeroMosaic({ articles }: HeroMosaicProps) {
   }
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 fluid-hover-grid">
       {/* Article 1: Large hero card (2x2 on desktop) */}
       {displayArticles[0] && (
         <div className="lg:col-span-2 lg:row-span-2">
-          <MosaicCard article={displayArticles[0]} size="hero" priority={true} />
+          <MosaicCard article={displayArticles[0]} size="hero" priority={true} featured />
         </div>
       )}
 
       {/* Article 2: Medium card (top right on desktop) */}
       {displayArticles[1] && (
         <div className="lg:col-span-1 lg:row-span-1">
-          <MosaicCard article={displayArticles[1]} size="medium" />
+          <MosaicCard article={displayArticles[1]} size="medium"  />
         </div>
       )}
 
       {/* Article 3: Small card (middle right on desktop) */}
       {displayArticles[2] && (
         <div className="lg:col-span-1 lg:row-span-1">
-          <MosaicCard article={displayArticles[2]} size="small" />
+          <MosaicCard article={displayArticles[2]} size="small"  />
         </div>
       )}
 

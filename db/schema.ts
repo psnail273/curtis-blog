@@ -1,4 +1,5 @@
-import { pgTable, uuid, varchar, integer, text, timestamp, jsonb, index } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, varchar, integer, text, timestamp, jsonb, boolean, index, unique, check } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 
 export const files = pgTable('files', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -10,7 +11,11 @@ export const files = pgTable('files', {
   description: text('description'),
   url: text('url').notNull(),
   metadata: jsonb('metadata').notNull().default({}),
-})
+}, (table) => [
+  check('files_type_check', sql`${table.type} IN ('code', 'video', 'pdf', 'image', 'document', 'other')`),
+  index('idx_files_type').on(table.type),
+  index('idx_files_path').on(table.path),
+])
 
 export const articles = pgTable('articles', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -19,14 +24,18 @@ export const articles = pgTable('articles', {
   excerpt: text('excerpt').notNull(),
   content: text('content').notNull(),
   author: varchar('author', { length: 255 }).notNull().default('Curtis Israel'),
-  publishedAt: timestamp('published_at', { withTimezone: true }).notNull(),
+  publishedAt: timestamp('published_at', { withTimezone: true }),
   category: varchar('category', { length: 100 }).notNull(),
   readTime: integer('read_time').notNull(),
   coverImage: text('cover_image'),
   status: varchar('status', { length: 20 }).notNull().default('draft'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-})
+}, (table) => [
+  index('idx_articles_published_at')
+    .on(table.publishedAt.desc().nullsLast())
+    .where(sql`${table.status} = 'published'`),
+])
 
 export const aboutPage = pgTable('about_page', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -44,7 +53,11 @@ export const users = pgTable('users', {
   provider: varchar('provider', { length: 50 }).notNull().default('google'),
   providerId: varchar('provider_id', { length: 255 }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-})
+}, (table) => [
+  unique('users_provider_provider_id_unique').on(table.provider, table.providerId),
+  index('idx_users_provider_id').on(table.provider, table.providerId),
+  index('idx_users_email').on(table.email),
+])
 
 export const comments = pgTable('comments', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -65,4 +78,35 @@ export const commentLikes = pgTable('comment_likes', {
   commentId: uuid('comment_id').notNull().references(() => comments.id, { onDelete: 'cascade' }),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-})
+}, (table) => [
+  unique('comment_likes_comment_id_user_id_unique').on(table.commentId, table.userId),
+  index('idx_comment_likes_comment_id').on(table.commentId),
+  index('idx_comment_likes_user_id').on(table.userId),
+])
+
+export const pastStreams = pgTable('past_streams', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  platform: varchar('platform', { length: 20 }).notNull(),
+  platformId: varchar('platform_id', { length: 255 }).notNull(),
+  title: text('title').notNull(),
+  url: text('url').notNull(),
+  thumbnailUrl: text('thumbnail_url').notNull(),
+  duration: varchar('duration', { length: 20 }).notNull(),
+  viewCount: integer('view_count').notNull().default(0),
+  streamedAt: timestamp('streamed_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique('past_streams_platform_platform_id_unique').on(table.platform, table.platformId),
+  index('idx_past_streams_date').on(table.streamedAt.desc()),
+])
+
+export const liveStatus = pgTable('live_status', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  platform: varchar('platform', { length: 20 }).notNull(),
+  username: varchar('username', { length: 255 }).notNull(),
+  isLive: boolean('is_live').notNull().default(false),
+  metadata: jsonb('metadata').notNull().default({}),
+  checkedAt: timestamp('checked_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique('live_status_platform_username_unique').on(table.platform, table.username),
+])

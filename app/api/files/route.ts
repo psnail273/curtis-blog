@@ -1,23 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { toFileRecord } from '@/lib/file-utils';
 import { FileRecord, FileRow, FILE_TYPES, FileType } from '@/types/file';
-
-/**
- * Map a database row (snake_case) to a FileRecord (camelCase).
- */
-function toFileRecord(row: FileRow): FileRecord {
-  return {
-    id: row.id,
-    name: row.name,
-    path: row.path,
-    type: row.type,
-    size: row.size,
-    uploadDate: row.upload_date,
-    description: row.description,
-    url: row.url,
-    metadata: row.metadata,
-  };
-}
 
 /**
  * GET /api/files

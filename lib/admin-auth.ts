@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 const COOKIE_NAME = 'admin_session';
 const SESSION_MAX_AGE = 60 * 60 * 24; // 24 hours in seconds
@@ -76,6 +77,25 @@ export function verifyPassword(password: string): boolean {
     result |= expected.charCodeAt(i) ^ password.charCodeAt(i);
   }
   return result === 0;
+}
+
+/**
+ * Defense-in-depth auth check for admin API route handlers.
+ * Returns a 401 NextResponse if the session is invalid, or null if authenticated.
+ *
+ * Usage at the top of each handler:
+ *   const authError = await requireAdminAuth();
+ *   if (authError) return authError;
+ */
+export async function requireAdminAuth(): Promise<NextResponse | null> {
+  const authenticated = await isAdminAuthenticated();
+  if (!authenticated) {
+    return NextResponse.json(
+      { error: 'Unauthorized. Please log in.' },
+      { status: 401 }
+    );
+  }
+  return null;
 }
 
 export async function isAdminAuthenticated(): Promise<boolean> {

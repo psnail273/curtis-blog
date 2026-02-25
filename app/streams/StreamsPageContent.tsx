@@ -2,12 +2,17 @@
 
 import { StreamHero } from '@/components/streams/StreamHero';
 import { PastStreamsGrid } from '@/components/streams/PastStreamsGrid';
+import type { PastStream } from '@/lib/services/stream-utils';
 
-export function StreamsPageContent() {
+interface StreamsPageContentProps {
+  initialStreams: PastStream[];
+}
+
+export function StreamsPageContent({ initialStreams }: StreamsPageContentProps) {
   return (
     <>
       <StreamHero />
-      <PastStreamsGrid />
+      <PastStreamsGrid initialStreams={initialStreams} />
     </>
   );
 }

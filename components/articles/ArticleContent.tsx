@@ -12,17 +12,16 @@ export function ArticleContent({ content }: ArticleContentProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          // Images break wider for editorial impact
           img: ({ src, alt }) => {
             if (!src || typeof src !== 'string') return null;
             return (
-              <span className="block -mx-4 md:-mx-8 lg:-mx-16 my-8">
+              <span className="block my-8">
                 <Image
                   src={src}
                   alt={alt || ''}
-                  width={896}
-                  height={504}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 896px"
+                  width={768}
+                  height={432}
+                  sizes="(max-width: 768px) 100vw, 768px"
                   className="w-full h-auto rounded-lg"
                 />
               </span>

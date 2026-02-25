@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import type { Article } from '@/types/article';
 
@@ -62,6 +62,10 @@ export function ArticleForm({ article, onSave, onCancel }: ArticleFormProps) {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [draggingContent, setDraggingContent] = useState(false);
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  const contentValueRef = useRef(form.content);
+  useEffect(() => {
+    contentValueRef.current = form.content;
+  }, [form.content]);
 
   async function uploadFile(file: File): Promise<string | null> {
     const formData = new FormData();
@@ -160,6 +164,7 @@ export function ArticleForm({ article, onSave, onCancel }: ArticleFormProps) {
     const before = textarea.value.substring(0, start);
     const after = textarea.value.substring(end);
     const newValue = before + text + after;
+    contentValueRef.current = newValue;
     updateField('content', newValue);
     // Restore cursor position after the inserted text
     requestAnimationFrame(() => {
@@ -179,15 +184,19 @@ export function ArticleForm({ article, onSave, onCancel }: ArticleFormProps) {
     try {
       const url = await uploadFile(file);
       if (url) {
-        // Replace placeholder with real URL
-        const current = form.content;
+        // Read from ref — always has the latest content including placeholder
+        const current = contentValueRef.current;
         const markdown = `![${file.name}](${url})`;
-        updateField('content', current.replace(placeholder, markdown));
+        const updated = current.replace(placeholder, markdown);
+        contentValueRef.current = updated;
+        updateField('content', updated);
       }
     } catch (err) {
-      // Replace placeholder with error
-      const current = form.content;
-      updateField('content', current.replace(placeholder, ''));
+      // Read from ref for error case too
+      const current = contentValueRef.current;
+      const updated = current.replace(placeholder, '');
+      contentValueRef.current = updated;
+      updateField('content', updated);
       setError(err instanceof Error ? err.message : 'Image upload failed');
     }
   }

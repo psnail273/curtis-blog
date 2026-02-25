@@ -70,7 +70,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Fetch categories from database for header navigation
+  // Fetch categories from database for header navigation.
+  // Trade-off: this runs on every request, but the query is fast and categories
+  // rarely change. If performance becomes an issue, wrap with unstable_cache.
   let categories: string[] = [];
   try {
     const { getDb } = await import('@/lib/db');
@@ -101,7 +103,7 @@ export default async function RootLayout({
             <Suspense>
               <Header categories={categories} />
             </Suspense>
-            <main id="main-content" className="mx-auto max-w-6xl px-4 md:px-8 mt-4">
+            <main id="main-content" className="mx-auto max-w-6xl px-4 md:px-8 mt-6 md:mt-8 pb-16">
               {children}
             </main>
             <Footer />
