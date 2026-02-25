@@ -39,12 +39,14 @@ export async function GET(
       SELECT
         c.id,
         c.article_id,
+        c.parent_id,
         c.content,
         c.created_at,
         c.updated_at,
         u.id AS user_id,
         u.name AS user_name,
         u.image AS user_image,
+        pu.name AS parent_user_name,
         COUNT(DISTINCT cl.id) AS like_count,
         ${currentUser?.id || null}::uuid IS NOT NULL
           AND EXISTS (
@@ -53,15 +55,19 @@ export async function GET(
           ) AS liked_by_current_user
       FROM comments c
       INNER JOIN users u ON c.user_id = u.id
+      LEFT JOIN comments pc ON c.parent_id = pc.id
+      LEFT JOIN users pu ON pc.user_id = pu.id
       LEFT JOIN comment_likes cl ON c.id = cl.comment_id
       WHERE c.article_id = ${articleId}
-      GROUP BY c.id, u.id
+      GROUP BY c.id, u.id, pu.name
       ORDER BY c.created_at ASC
     `;
 
     const comments: Comment[] = (rows as CommentWithUserRow[]).map((row) => ({
       id: row.id,
       articleId: row.article_id,
+      parentId: row.parent_id ?? null,
+      parentUserName: row.parent_user_name ?? null,
       user: {
         id: row.user_id,
         name: row.user_name,
@@ -131,14 +137,30 @@ export async function POST(
       );
     }
 
+    // Validate parentId if provided
+    const parentId = body.parentId || null;
+
+    if (parentId) {
+      const parentRows = await sql`
+        SELECT id FROM comments WHERE id = ${parentId} AND article_id = ${articleId}
+      `;
+
+      if (parentRows.length === 0) {
+        return NextResponse.json(
+          { error: 'Parent comment not found or belongs to a different article' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Strip HTML tags for security (defense-in-depth, React auto-escapes but this prevents stored XSS)
     const sanitizedContent = content.replace(/<[^>]*>/g, '');
 
     // Insert comment
     const commentRows = await sql`
-      INSERT INTO comments (article_id, user_id, content)
-      VALUES (${articleId}, ${user.id}, ${sanitizedContent})
-      RETURNING id, article_id, user_id, content, created_at, updated_at
+      INSERT INTO comments (article_id, user_id, content, parent_id)
+      VALUES (${articleId}, ${user.id}, ${sanitizedContent}, ${parentId})
+      RETURNING id, article_id, user_id, parent_id, content, created_at, updated_at
     `;
 
     if (commentRows.length === 0) {
@@ -158,6 +180,8 @@ export async function POST(
     const comment: Comment = {
       id: newComment.id,
       articleId: newComment.article_id,
+      parentId: newComment.parent_id ?? null,
+      parentUserName: null,
       user: {
         id: userRows[0].id,
         name: userRows[0].name,
