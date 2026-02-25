@@ -17,6 +17,7 @@ export function CommentsSection({ slug }: CommentsSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
   const isAuthenticated = status === 'authenticated';
   const currentUserId = session?.user?.id;
@@ -44,6 +45,14 @@ export function CommentsSection({ slug }: CommentsSectionProps) {
     fetchComments();
   }, [fetchComments]);
 
+  const handleReply = (commentId: string) => {
+    setReplyingTo(commentId);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+  };
+
   const handleDelete = async (commentId: string) => {
     const response = await fetch(`/api/comments/${commentId}`, {
       method: 'DELETE',
@@ -54,8 +63,8 @@ export function CommentsSection({ slug }: CommentsSectionProps) {
       throw new Error(data.error || 'Failed to delete comment');
     }
 
-    // Remove from local state
-    setComments((prev) => prev.filter((c) => c.id !== commentId));
+    // Refetch all comments since cascading delete may remove descendants
+    fetchComments();
   };
 
   const handleToggleLike = async (commentId: string) => {
@@ -81,7 +90,7 @@ export function CommentsSection({ slug }: CommentsSectionProps) {
   };
 
   return (
-    <section aria-label="Comments" className="max-w-prose mx-auto">
+    <section aria-label="Comments">
       {/* Section heading */}
       <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground mb-6 md:mb-8 pb-4 border-b border-border">
         Comments ({comments.length})
@@ -147,8 +156,15 @@ export function CommentsSection({ slug }: CommentsSectionProps) {
           comments={comments}
           currentUserId={currentUserId}
           isAdmin={isAdmin}
+          isAuthenticated={isAuthenticated}
           onDelete={handleDelete}
           onToggleLike={handleToggleLike}
+          replyingTo={replyingTo}
+          onReply={handleReply}
+          onCancelReply={handleCancelReply}
+          onCommentAdded={() => { setReplyingTo(null); fetchComments(); }}
+          articleSlug={slug}
+          session={session}
         />
       )}
     </section>
