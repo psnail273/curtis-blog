@@ -25,14 +25,19 @@ Add a nullable `deletedAt` timestamp column to the `comments` table.
 
 **Admin status endpoint:** Reuse existing `GET /api/admin/auth` — already returns `{ authenticated: boolean }`.
 
-**Comment delete endpoint (`DELETE /api/comments/[id]`):** Replace the `isAdmin(email)` check with direct verification of the `admin_session` cookie using the existing `verifySessionToken()` function from `lib/admin-auth.ts`. Authorization logic becomes:
-- Allow if the OAuth-authenticated user is the comment author, OR
-- Allow if the request has a valid `admin_session` cookie (no OAuth required)
+**Comment delete endpoint (`DELETE /api/comments/[id]`):** Replace the current `requireAuth()` + `isAdmin(email)` pattern with conditional logic:
+1. Attempt to get the current user via `getCurrentUser()` (non-throwing)
+2. Check admin status via `isAdminAuthenticated()` from `lib/admin-auth.ts` (handles cookie extraction automatically)
+3. If no OAuth user AND no valid admin session: return 401
+4. Authorization:
+   - Allow if the OAuth-authenticated user is the comment author, OR
+   - Allow if the request has a valid `admin_session` cookie (no OAuth required)
 
 **Soft delete logic in the delete endpoint:**
 1. Check if the comment has any replies (child comments with matching `parentId`)
 2. If yes: UPDATE the comment, setting `deletedAt = NOW()`, and delete associated likes
 3. If no: DELETE the comment row and associated likes (existing behavior)
+4. After hard-deleting a comment, check if its parent is soft-deleted and now has zero remaining children — if so, hard-delete the parent too (recursive cleanup of orphaned placeholders)
 
 ### Client-Side: `useAdminStatus` Hook
 
@@ -69,8 +74,9 @@ Remove all references to `ADMIN_EMAIL` and `NEXT_PUBLIC_ADMIN_EMAIL` from:
 - `lib/auth-helpers.ts` — remove the `isAdmin()` function
 - `components/comments/CommentsSection.tsx` — remove email comparison
 - `env.example`
-- `Dockerfile`
-- CI workflow files (`.gitea/workflows/`)
+- `Dockerfile` — remove both `NEXT_PUBLIC_ADMIN_EMAIL` build arg/env AND `ADMIN_EMAIL` secret mount
+- CI workflow files (`.gitea/workflows/`) — remove build-arg, secret, and runtime `-e` references
+- `README.md` — remove `ADMIN_EMAIL` reference
 - `.env.prod` or any other env files
 
 ## Files Affected
@@ -86,8 +92,10 @@ Remove all references to `ADMIN_EMAIL` and `NEXT_PUBLIC_ADMIN_EMAIL` from:
 | `components/header/header.tsx` | Shield icon for admin |
 | `lib/auth-helpers.ts` | Remove `isAdmin()` function |
 | `env.example` | Remove `ADMIN_EMAIL`, `NEXT_PUBLIC_ADMIN_EMAIL` |
-| `Dockerfile` | Remove `NEXT_PUBLIC_ADMIN_EMAIL` build arg |
-| `.gitea/workflows/*.yaml` | Remove admin email secrets |
+| `types/comment.ts` | Add optional `deleted: boolean` field |
+| `Dockerfile` | Remove `NEXT_PUBLIC_ADMIN_EMAIL` build arg/env and `ADMIN_EMAIL` secret mount |
+| `.gitea/workflows/*.yaml` | Remove admin email build-arg, secret, and runtime `-e` references |
+| `README.md` | Remove `ADMIN_EMAIL` reference |
 
 ## Non-Goals
 
