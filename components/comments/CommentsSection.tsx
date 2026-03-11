@@ -6,6 +6,7 @@ import { AlertCircle } from 'lucide-react';
 import { CommentList } from './CommentList';
 import { CommentForm } from './CommentForm';
 import { SignInPrompt } from './SignInPrompt';
+import { useAdminStatus } from '@/lib/hooks/use-admin-status';
 import type { Comment } from '@/types/comment';
 
 interface CommentsSectionProps {
@@ -21,7 +22,7 @@ export function CommentsSection({ slug }: CommentsSectionProps) {
 
   const isAuthenticated = status === 'authenticated';
   const currentUserId = session?.user?.id;
-  const isAdmin = session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  const { isAdmin } = useAdminStatus();
 
   const fetchComments = useCallback(async () => {
     setIsLoading(true);
