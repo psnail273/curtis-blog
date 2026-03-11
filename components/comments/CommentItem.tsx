@@ -32,6 +32,18 @@ export function CommentItem({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Render placeholder for soft-deleted comments (must be after all hooks)
+  if (comment.deleted) {
+    return (
+      <article
+        className="border border-border rounded-lg p-4 md:p-5 bg-card/50"
+        aria-label="Deleted comment"
+      >
+        <p className="text-sm text-muted italic">This comment has been deleted</p>
+      </article>
+    );
+  }
+
   const isAuthor = currentUserId === comment.user.id;
   const canDelete = isAuthor || isAdmin;
 
