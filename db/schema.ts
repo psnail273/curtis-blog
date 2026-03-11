@@ -67,6 +67,7 @@ export const comments = pgTable('comments', {
   content: text('content').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 }, (table) => [
   index('idx_comments_article_id').on(table.articleId, table.createdAt.asc()),
   index('idx_comments_user_id').on(table.userId),
