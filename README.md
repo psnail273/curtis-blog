@@ -44,7 +44,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 See `env.example` for all required variables:
 
 - **Database** — `DATABASE_URL` (Neon Postgres connection string)
-- **Authentication** — `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET`, `ADMIN_EMAIL`
+- **Authentication** — `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET`
 - **Admin** — `ADMIN_PASSWORD` (for admin dashboard access)
 - **Streaming** — `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`, `YOUTUBE_API_KEY` (optional, for live status)
 
