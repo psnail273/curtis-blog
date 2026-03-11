@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
+import { useAdminStatus } from '@/lib/hooks/use-admin-status';
 import { SearchTrigger } from '@/components/search/SearchTrigger';
 import HamburgerButton from './hamburgerButton/HamburgerButton';
 import MobileNav from './mobileNav/MobileNav';
@@ -43,6 +45,7 @@ export default function Header({ categories }: HeaderProps) {
   const searchParams = useSearchParams();
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const { isAnyLive } = useLiveStatus();
+  const { isAdmin } = useAdminStatus();
 
   const activeCategory = pathname === '/' ? searchParams.get('category') : null;
 
@@ -74,8 +77,17 @@ export default function Header({ categories }: HeaderProps) {
             Curtis Israel
           </Link>
 
-          {/* Mobile: search + hamburger — absolute positioned on right */}
+          {/* Mobile: search + admin + hamburger — absolute positioned on right */}
           <div className="lg:hidden absolute right-4 flex items-center gap-1">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="p-2 text-muted hover:text-accent transition-colors"
+                aria-label="Admin dashboard"
+              >
+                <Shield className="size-5" />
+              </Link>
+            )}
             <SearchTrigger />
             <HamburgerButton
               ref={hamburgerRef}
@@ -132,8 +144,17 @@ export default function Header({ categories }: HeaderProps) {
             <NavLink href="/support" isActive={pathname === '/support'}>Support</NavLink>
           </nav>
 
-          {/* Search trigger on right */}
-          <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2">
+          {/* Right side: admin + search */}
+          <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="p-1.5 text-muted hover:text-accent transition-colors"
+                aria-label="Admin dashboard"
+              >
+                <Shield className="size-5" />
+              </Link>
+            )}
             <SearchTrigger />
           </div>
         </div>
