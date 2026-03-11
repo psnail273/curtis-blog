@@ -43,6 +43,7 @@ export async function GET(
         c.content,
         c.created_at,
         c.updated_at,
+        c.deleted_at,
         u.id AS user_id,
         u.name AS user_name,
         u.image AS user_image,
@@ -63,22 +64,28 @@ export async function GET(
       ORDER BY c.created_at ASC
     `;
 
-    const comments: Comment[] = (rows as CommentWithUserRow[]).map((row) => ({
-      id: row.id,
-      articleId: row.article_id,
-      parentId: row.parent_id ?? null,
-      parentUserName: row.parent_user_name ?? null,
-      user: {
-        id: row.user_id,
-        name: row.user_name,
-        image: row.user_image,
-      },
-      content: row.content,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      likeCount: Number(row.like_count),
-      likedByCurrentUser: Boolean(row.liked_by_current_user),
-    }));
+    const comments: Comment[] = (rows as CommentWithUserRow[]).map((row) => {
+      const isDeleted = row.deleted_at !== null;
+      return {
+        id: row.id,
+        articleId: row.article_id,
+        parentId: row.parent_id ?? null,
+        parentUserName: row.parent_user_name ?? null,
+        user: isDeleted
+          ? { id: '', name: '', image: null }
+          : {
+              id: row.user_id,
+              name: row.user_name,
+              image: row.user_image,
+            },
+        content: isDeleted ? '' : row.content,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        likeCount: isDeleted ? 0 : Number(row.like_count),
+        likedByCurrentUser: isDeleted ? false : Boolean(row.liked_by_current_user),
+        deleted: isDeleted,
+      };
+    });
 
     return NextResponse.json(comments);
   } catch (error) {
@@ -192,6 +199,7 @@ export async function POST(
       updatedAt: newComment.updated_at,
       likeCount: 0,
       likedByCurrentUser: false,
+      deleted: false,
     };
 
     return NextResponse.json(comment, { status: 201 });
