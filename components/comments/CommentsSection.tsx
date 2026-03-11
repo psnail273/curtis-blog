@@ -94,7 +94,7 @@ export function CommentsSection({ slug }: CommentsSectionProps) {
     <section aria-label="Comments">
       {/* Section heading */}
       <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground mb-6 md:mb-8 pb-4 border-b border-border">
-        Comments ({comments.length})
+        Comments ({comments.filter(c => !c.deleted).length})
       </h2>
 
       {/* Comment form or sign-in prompt */}

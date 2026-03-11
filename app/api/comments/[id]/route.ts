@@ -71,9 +71,11 @@ export async function DELETE(
     const hasReplies = replyRows[0].count > 0;
 
     if (hasReplies) {
-      // Soft delete: set deleted_at, remove likes
-      await sql`UPDATE comments SET deleted_at = NOW() WHERE id = ${id}`;
-      await sql`DELETE FROM comment_likes WHERE comment_id = ${id}`;
+      // Soft delete: set deleted_at, remove likes (transactional)
+      await sql.transaction([
+        sql`UPDATE comments SET deleted_at = NOW() WHERE id = ${id}`,
+        sql`DELETE FROM comment_likes WHERE comment_id = ${id}`,
+      ]);
     } else {
       // Hard delete: remove the comment and its likes (cascade handles likes)
       await sql`DELETE FROM comments WHERE id = ${id}`;
@@ -118,7 +120,9 @@ async function cleanupOrphanedParent(
   `;
 
   if (childRows[0].count === 0) {
-    // No remaining non-deleted children — hard delete the orphaned parent
+    // Remove any remaining soft-deleted children before deleting the parent
+    await sql`DELETE FROM comments WHERE parent_id = ${parentId} AND deleted_at IS NOT NULL`;
+    // Hard delete the orphaned parent
     await sql`DELETE FROM comments WHERE id = ${parentId}`;
 
     // Recurse up the tree
