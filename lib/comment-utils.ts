@@ -26,6 +26,7 @@ export interface CommentRow {
   content: string;
   created_at: string;
   updated_at: string;
+  deleted_at: string | null;
 }
 
 /**
@@ -41,6 +42,7 @@ export interface CommentWithUserRow {
   content: string;
   created_at: string;
   updated_at: string;
+  deleted_at: string | null;
   user_name: string;
   user_image: string | null;
   like_count: number;
@@ -95,6 +97,7 @@ export function toComment(row: CommentWithUserRow): Comment {
     updatedAt: row.updated_at,
     likeCount: row.like_count,
     likedByCurrentUser: row.liked_by_current_user ?? false,
+    deleted: row.deleted_at !== null,
   };
 }
 

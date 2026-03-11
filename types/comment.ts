@@ -28,6 +28,7 @@ export interface Comment {
   updatedAt: string;
   likeCount: number;
   likedByCurrentUser: boolean;
+  deleted: boolean;
 }
 
 /**
