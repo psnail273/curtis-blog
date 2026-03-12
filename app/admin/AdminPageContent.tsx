@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { invalidateAdminStatus } from '@/lib/hooks/use-admin-status';
 import { LoginGate } from './components/LoginGate';
 import { ArticlesManager } from './components/ArticlesManager';
 import { AboutManager } from './components/AboutManager';
@@ -33,6 +34,7 @@ export function AdminPageContent() {
     } catch {
       // Clear local state even if the request fails
     }
+    invalidateAdminStatus(false);
     setAuthenticated(false);
   }
 
@@ -47,7 +49,10 @@ export function AdminPageContent() {
 
   // Show login form if not authenticated
   if (!authenticated) {
-    return <LoginGate onLogin={() => setAuthenticated(true)} />;
+    return <LoginGate onLogin={() => {
+      invalidateAdminStatus(true);
+      setAuthenticated(true);
+    }} />;
   }
 
   return (
