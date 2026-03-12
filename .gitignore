@@ -41,9 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # ai
-.claude
-.claude-home
-.cursor
-docs/
-CLAUDE.md
-.mcp.json
+.claude-home/

@@ -54,28 +54,15 @@ MOUNT_ARGS=(
 # Mount ~/.claude user-level config (auth/credentials) — uses a separate dir
 # from the project's .claude/ to avoid skills appearing twice.
 mkdir -p ".claude-home"
-MOUNT_ARGS+=(-v "$(pwd)/.claude-home:/home/claude/.claude:z")
-
-# # Mount user-level skills, plugins, mcp-servers, agents from host ~/.claude/
-# # (These overlay on top of .claude-home/ so the user's host config is available)
-# for subdir in skills plugins mcp-servers agents hooks; do
-#     if [[ -d "$HOME/.claude/$subdir" ]]; then
-#         MOUNT_ARGS+=(-v "$HOME/.claude/$subdir:/home/claude/.claude/$subdir:z")
-#     fi
-# done
-
-# Mount ~/.agents/ so symlinks in ~/.claude/skills/ resolve inside the container
-if [[ -d "$HOME/.agents" ]]; then
-    MOUNT_ARGS+=(-v "$HOME/.agents:/home/claude/.agents:ro,z")
-fi
+MOUNT_ARGS+=(-v "$(pwd)/.claude-home:/home/node/.claude:z")
 
 # Mount .claude.json so auth config persists across sessions
 [[ -s ".claude.json" ]] || echo '{}' > ".claude.json"
-MOUNT_ARGS+=(-v ".claude.json:/home/claude/.claude.json:z")
+MOUNT_ARGS+=(-v ".claude.json:/home/node/.claude.json:z")
 
 # Mount git config so commits inside container have correct identity
 if [[ -f "$HOME/.gitconfig" ]]; then
-    MOUNT_ARGS+=(-v "$HOME/.gitconfig:/home/claude/.gitconfig:ro,z")
+    MOUNT_ARGS+=(-v "$HOME/.gitconfig:/home/node/.gitconfig:ro,z")
 fi
 
 # ---------- Run ----------
@@ -88,6 +75,5 @@ exec $RUNTIME run \
     -it \
     --name "$CONTAINER_NAME" \
     "${MOUNT_ARGS[@]}" \
-    --userns=keep-id \
     "$IMAGE_NAME" \
     "$@"

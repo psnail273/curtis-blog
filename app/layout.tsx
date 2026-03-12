@@ -100,7 +100,15 @@ export default async function RootLayout({
         </a>
         <AuthProvider>
           <LiveStatusProvider streams={streams}>
-            <Suspense>
+            <Suspense fallback={
+              <header className="w-full border-b border-border mb-6">
+                <div className="flex items-center justify-center py-4 md:py-6 px-4 md:px-8 relative">
+                  <span className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground tracking-tight uppercase">
+                    Curtis Israel
+                  </span>
+                </div>
+              </header>
+            }>
               <Header categories={categories} />
             </Suspense>
             <main id="main-content" className="mx-auto max-w-6xl px-4 md:px-8 mt-6 md:mt-8 pb-16">

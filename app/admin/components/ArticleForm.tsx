@@ -363,7 +363,7 @@ export function ArticleForm({ article, onSave, onCancel }: ArticleFormProps) {
               fieldErrors.content ? 'border-destructive' :
                 draggingContent ? 'border-accent' : 'border-border'
             )}
-            placeholder="Article content in Markdown"
+            placeholder="Article content in Markdown, drag photos to automatically upload them inline"
             onDragOver={(e) => {
               e.preventDefault();
               setDraggingContent(true);

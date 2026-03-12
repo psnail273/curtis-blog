@@ -15,14 +15,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up workspace directory and consistent HOME for auth persistence
-RUN mkdir -p /workspaces /home/claude && chmod 777 /home/claude
-ENV HOME=/home/claude
+RUN mkdir -p /workspaces && chown node:node /workspaces
 
-# Install Claude Code globally via npm (node image already has /usr/local/bin on PATH)
+ENV HOME=/home/node
+
 RUN npm install -g @anthropic-ai/claude-code
+
+USER node
 
 WORKDIR /workspaces
 
-# Read API key from secret mount at runtime, then exec claude
 ENTRYPOINT ["/bin/bash", "-c", "exec claude --dangerously-skip-permissions \"$@\"", "--"]
