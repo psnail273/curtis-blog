@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Shield } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
 import { useAdminStatus } from '@/lib/hooks/use-admin-status';
@@ -77,17 +77,8 @@ export default function Header({ categories }: HeaderProps) {
             Curtis Israel
           </Link>
 
-          {/* Mobile: search + admin + hamburger — absolute positioned on right */}
+          {/* Mobile: search + hamburger — absolute positioned on right */}
           <div className="lg:hidden absolute right-4 flex items-center gap-1">
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="p-2 text-muted hover:text-accent transition-colors"
-                aria-label="Admin dashboard"
-              >
-                <Shield className="size-5" />
-              </Link>
-            )}
             <SearchTrigger />
             <HamburgerButton
               ref={hamburgerRef}
@@ -142,19 +133,13 @@ export default function Header({ categories }: HeaderProps) {
             <NavLink href="/about" isActive={pathname === '/about'}>About</NavLink>
             <NavLink href="/files" isActive={pathname === '/files'}>Files</NavLink>
             <NavLink href="/support" isActive={pathname === '/support'}>Support</NavLink>
+            {isAdmin && (
+              <NavLink href="/admin" isActive={pathname === '/admin'}>Admin</NavLink>
+            )}
           </nav>
 
-          {/* Right side: admin + search */}
+          {/* Right side: search */}
           <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="p-1.5 text-muted hover:text-accent transition-colors"
-                aria-label="Admin dashboard"
-              >
-                <Shield className="size-5" />
-              </Link>
-            )}
             <SearchTrigger />
           </div>
         </div>
@@ -166,6 +151,7 @@ export default function Header({ categories }: HeaderProps) {
         onClose={() => setIsMobileMenuOpen(false)}
         hamburgerButtonRef={hamburgerRef}
         categories={categories}
+        isAdmin={isAdmin}
       />
     </>
   );

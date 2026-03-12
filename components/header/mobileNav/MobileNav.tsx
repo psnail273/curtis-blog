@@ -12,9 +12,10 @@ interface MobileNavProps {
   onClose: () => void;
   hamburgerButtonRef: React.RefObject<HTMLButtonElement | null>;
   categories: string[];
+  isAdmin: boolean;
 }
 
-export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categories }: MobileNavProps) {
+export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categories, isAdmin }: MobileNavProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -299,6 +300,25 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
           >
             Support
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={onClose}
+              className={cn(
+                'block w-full text-left px-4 py-2 rounded-lg',
+                'text-base font-sans',
+                'transition-colors duration-200',
+                'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+                'min-h-[44px] flex items-center',
+                pathname === '/admin'
+                  ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
+                  : 'text-muted hover:bg-accent/10 hover:text-accent'
+              )}
+              aria-current={pathname === '/admin' ? 'page' : undefined}
+            >
+              Admin
+            </Link>
+          )}
         </nav>
       </div>
     </>
