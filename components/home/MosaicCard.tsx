@@ -26,7 +26,7 @@ export function MosaicCard({ article, size, priority = false, showCategory = tru
           'relative h-full flex flex-col border border-border rounded-lg overflow-hidden',
           'transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
           'hover:shadow-warm-hover',
-          'bg-card category-hover-border',
+          'bg-card category-hover-border category-hover-edge',
           featured && 'category-glow-static'
         )}
         style={getCategoryStyle(article.category)}

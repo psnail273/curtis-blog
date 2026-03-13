@@ -70,7 +70,7 @@ export function CategoryArticles({
             'category-color hover:underline transition-colors self-end'
           )}
         >
-          View All
+          View all {category.toLowerCase()} articles
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       )}

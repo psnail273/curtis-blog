@@ -14,7 +14,7 @@ export function HeroMosaic({ articles }: HeroMosaicProps) {
   }
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 fluid-hover-grid">
+    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {/* Article 1: Large hero card (2x2 on desktop) */}
       {displayArticles[0] && (
         <div className="lg:col-span-2 lg:row-span-2">
