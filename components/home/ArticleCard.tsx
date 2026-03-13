@@ -37,11 +37,11 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
               sizes="(max-width: 640px) 100vw, 224px"
               className="object-cover"
             />
-            {article.status === 'draft' && (
+            {/* {article.status === 'draft' && (
               <span className="absolute top-2 left-2 z-10 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wide shadow-sm">
                 Draft
               </span>
-            )}
+            )} */}
           </div>
         )}
 
