@@ -1,20 +1,17 @@
 export const dynamic = 'force-dynamic';
 
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import nextDynamic from 'next/dynamic';
 import { ArrowLeft } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import type { ArticleRow } from '@/lib/article-utils';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { formatDateLong } from '@/lib/format-utils';
 import { ArticleContent } from '@/components/articles/ArticleContent';
-
-const CommentsSection = nextDynamic(
-  () => import('@/components/comments/CommentsSection').then(mod => ({ default: mod.CommentsSection }))
-);
+import { CommentsSection } from '@/components/comments/CommentsSection';
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -154,8 +151,30 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <hr className="border-t border-border my-[var(--section-gap-mobile)] md:my-[var(--section-gap)]" />
 
       {/* Comments Section */}
-      <CommentsSection slug={slug} />
+      <Suspense fallback={<CommentsSkeleton />}>
+        <CommentsSection slug={slug} />
+      </Suspense>
     </article>
+  );
+}
+
+function CommentsSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-6 w-36 bg-border rounded mb-6" />
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex gap-3">
+            <div className="h-8 w-8 bg-border rounded-full shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-24 bg-border rounded" />
+              <div className="h-4 w-full bg-border rounded" />
+              <div className="h-4 w-2/3 bg-border rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
