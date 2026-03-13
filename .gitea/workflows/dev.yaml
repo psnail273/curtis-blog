@@ -51,18 +51,18 @@ jobs:
             git.stuffworks.net/psnail273/curtis-blog-dev:${{ steps.version.outputs.VERSION }}
             git.stuffworks.net/psnail273/curtis-blog-dev:latest
           build-args: |
-            NEXT_PUBLIC_TWITCH_USERNAME=${{ secrets.DEV_TWITCH_USERNAME }}
-            NEXT_PUBLIC_YOUTUBE_CHANNEL_ID=${{ secrets.DEV_YOUTUBE_CHANNEL_ID }}
-            NEXT_PUBLIC_YOUTUBE_HANDLE=${{ secrets.DEV_YOUTUBE_HANDLE }}
+            NEXT_PUBLIC_TWITCH_USERNAME=${{ secrets.TWITCH_USERNAME }}
+            NEXT_PUBLIC_YOUTUBE_CHANNEL_ID=${{ secrets.YOUTUBE_CHANNEL_ID }}
+            NEXT_PUBLIC_YOUTUBE_HANDLE=${{ secrets.YOUTUBE_HANDLE }}
           secrets: |
-            DATABASE_URL=${{ secrets.DEV_DATABASE_URL }}
-            AUTH_SECRET=${{ secrets.DEV_AUTH_SECRET }}
-            ADMIN_PASSWORD=${{ secrets.DEV_ADMIN_PASSWORD }}
-            GOOGLE_CLIENT_ID=${{ secrets.DEV_GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.DEV_GOOGLE_CLIENT_SECRET }}
-            TWITCH_CLIENT_ID=${{ secrets.DEV_TWITCH_CLIENT_ID }}
-            TWITCH_CLIENT_SECRET=${{ secrets.DEV_TWITCH_CLIENT_SECRET }}
-            YOUTUBE_API_KEY=${{ secrets.DEV_YOUTUBE_API_KEY }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            AUTH_SECRET=${{ secrets.AUTH_SECRET }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            TWITCH_CLIENT_ID=${{ secrets.TWITCH_CLIENT_ID }}
+            TWITCH_CLIENT_SECRET=${{ secrets.TWITCH_CLIENT_SECRET }}
+            YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}
             CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
             CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
             CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
@@ -108,14 +108,14 @@ jobs:
             --name curtis-blog-dev \
             --restart unless-stopped \
             --network caddy-network \
-            -e DATABASE_URL="${{ secrets.DEV_DATABASE_URL }}" \
-            -e AUTH_SECRET="${{ secrets.DEV_AUTH_SECRET }}" \
-            -e ADMIN_PASSWORD="${{ secrets.DEV_ADMIN_PASSWORD }}" \
-            -e GOOGLE_CLIENT_ID="${{ secrets.DEV_GOOGLE_CLIENT_ID }}" \
-            -e GOOGLE_CLIENT_SECRET="${{ secrets.DEV_GOOGLE_CLIENT_SECRET }}" \
-            -e TWITCH_CLIENT_ID="${{ secrets.DEV_TWITCH_CLIENT_ID }}" \
-            -e TWITCH_CLIENT_SECRET="${{ secrets.DEV_TWITCH_CLIENT_SECRET }}" \
-            -e YOUTUBE_API_KEY="${{ secrets.DEV_YOUTUBE_API_KEY }}" \
+            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -e AUTH_SECRET="${{ secrets.AUTH_SECRET }}" \
+            -e ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            -e TWITCH_CLIENT_ID="${{ secrets.TWITCH_CLIENT_ID }}" \
+            -e TWITCH_CLIENT_SECRET="${{ secrets.TWITCH_CLIENT_SECRET }}" \
+            -e YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}" \
             -e CLOUDINARY_CLOUD_NAME="${{ secrets.CLOUDINARY_CLOUD_NAME }}" \
             -e CLOUDINARY_API_KEY="${{ secrets.CLOUDINARY_API_KEY }}" \
             -e CLOUDINARY_API_SECRET="${{ secrets.CLOUDINARY_API_SECRET }}" \
