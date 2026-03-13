@@ -120,6 +120,8 @@ jobs:
             -e CLOUDINARY_API_KEY="${{ secrets.CLOUDINARY_API_KEY }}" \
             -e CLOUDINARY_API_SECRET="${{ secrets.CLOUDINARY_API_SECRET }}" \
             -e CLOUDINARY_FOLDER="${{ secrets.CLOUDINARY_FOLDER }}" \
+            -e AUTH_TRUST_HOST=true \
+            -e AUTH_URL=https://curtis.stuffworks.net \
             "$IMAGE"
 
           echo "Deployed version ${VERSION}"
