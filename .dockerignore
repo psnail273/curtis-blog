@@ -3,7 +3,7 @@
 
 # Allow files needed for the build
 !package.json
-!package-lock.json
+!package-lock.json*
 !next.config.ts
 !tsconfig.json
 !postcss.config.mjs
