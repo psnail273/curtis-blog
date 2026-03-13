@@ -1,8 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import { ArrowLeft } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import type { ArticleRow } from '@/lib/article-utils';
@@ -10,7 +12,7 @@ import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { formatDateLong } from '@/lib/format-utils';
 import { ArticleContent } from '@/components/articles/ArticleContent';
 
-const CommentsSection = dynamic(
+const CommentsSection = nextDynamic(
   () => import('@/components/comments/CommentsSection').then(mod => ({ default: mod.CommentsSection }))
 );
 
