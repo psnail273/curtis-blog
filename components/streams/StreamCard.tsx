@@ -34,14 +34,14 @@ export function StreamCard({ stream }: StreamCardProps) {
       className="block group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <article className="border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-warm-hover hover:-translate-y-1 bg-card">
-        {/* Thumbnail with overlay badges */}
-        <div className="relative aspect-[16/9] bg-muted">
+        {/* Thumbnail with overlay badges — scale on hover for video feel */}
+        <div className="relative aspect-[16/9] bg-muted overflow-hidden">
           <Image
             src={stream.thumbnailUrl}
             alt={stream.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
 
           {/* Duration badge */}

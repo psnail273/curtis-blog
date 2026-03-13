@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Trash2, Reply } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -31,6 +31,45 @@ export function CommentItem({
 }: CommentItemProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const deleteModalRef = useRef<HTMLDivElement>(null);
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Focus trap for delete confirmation modal
+  useEffect(() => {
+    if (!showDeleteConfirm) return;
+
+    const modal = deleteModalRef.current;
+    if (!modal) return;
+
+    // Focus first button in modal
+    const firstButton = modal.querySelector<HTMLButtonElement>('button');
+    firstButton?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Tab') return;
+      const focusable = modal!.querySelectorAll<HTMLElement>('button:not([disabled])');
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showDeleteConfirm]);
+
+  // Restore focus when modal closes
+  useEffect(() => {
+    if (!showDeleteConfirm) {
+      deleteButtonRef.current?.focus();
+    }
+  }, [showDeleteConfirm]);
 
   // Render placeholder for soft-deleted comments (must be after all hooks)
   if (comment.deleted) {
@@ -83,7 +122,7 @@ export function CommentItem({
             {comment.user.image ? (
               <Image
                 src={comment.user.image}
-                alt=""
+                alt={`${comment.user.name}'s avatar`}
                 width={48}
                 height={48}
                 className="rounded-full border border-border w-10 h-10 md:w-12 md:h-12"
@@ -133,11 +172,11 @@ export function CommentItem({
             </p>
 
             {/* Action buttons */}
-            <div className="mt-2 flex items-center gap-3">
+            <div className="mt-2 flex items-center gap-1">
               {isAuthenticated && (
                 <button
                   onClick={onReply}
-                  className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-accent transition-colors duration-200"
+                  className="inline-flex items-center gap-1.5 min-h-[44px] min-w-[44px] px-2 py-2 rounded-md text-xs text-muted hover:text-accent hover:bg-accent/5 transition-colors duration-200"
                 >
                   <Reply className="size-3.5" aria-hidden="true" />
                   Reply
@@ -145,9 +184,10 @@ export function CommentItem({
               )}
               {canDelete && (
                 <button
+                  ref={deleteButtonRef}
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={isDeleting}
-                  className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-destructive transition-colors duration-200"
+                  className="inline-flex items-center gap-1.5 min-h-[44px] min-w-[44px] px-2 py-2 rounded-md text-xs text-muted hover:text-destructive hover:bg-destructive/5 transition-colors duration-200"
                   aria-label="Delete comment"
                 >
                   <Trash2 className="size-3.5" aria-hidden="true" />
@@ -164,16 +204,20 @@ export function CommentItem({
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
           onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && !isDeleting) setShowDeleteConfirm(false);
+          }}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="delete-modal-title"
+          aria-labelledby={`delete-modal-title-${comment.id}`}
         >
           <div
+            ref={deleteModalRef}
             className="bg-card border border-border rounded-lg p-6 max-w-sm w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <h3
-              id="delete-modal-title"
+              id={`delete-modal-title-${comment.id}`}
               className="text-lg font-semibold text-foreground mb-2"
             >
               Delete Comment?

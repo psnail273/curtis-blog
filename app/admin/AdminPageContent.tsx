@@ -74,10 +74,11 @@ export function AdminPageContent() {
       </header>
 
       {/* Tab navigation */}
-      <nav className="flex gap-1 mb-8 border-b border-border" aria-label="Admin sections">
+      <div className="flex gap-1 mb-8 border-b border-border" role="tablist" aria-label="Admin sections">
         {(['articles', 'about', 'files'] as Tab[]).map((tab) => (
           <button
             key={tab}
+            id={`tab-${tab}`}
             onClick={() => setActiveTab(tab)}
             className={cn(
               'px-4 py-2.5 text-sm font-medium transition-colors relative capitalize',
@@ -86,7 +87,21 @@ export function AdminPageContent() {
                 : 'text-muted hover:text-foreground'
             )}
             aria-selected={activeTab === tab}
+            aria-controls={`tabpanel-${tab}`}
+            tabIndex={activeTab === tab ? 0 : -1}
             role="tab"
+            onKeyDown={(e) => {
+              const tabs: Tab[] = ['articles', 'about', 'files'];
+              const currentIndex = tabs.indexOf(tab);
+              let nextIndex = -1;
+              if (e.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+              else if (e.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+              if (nextIndex >= 0) {
+                e.preventDefault();
+                setActiveTab(tabs[nextIndex]);
+                document.getElementById(`tab-${tabs[nextIndex]}`)?.focus();
+              }
+            }}
           >
             {tab}
             {activeTab === tab && (
@@ -94,12 +109,18 @@ export function AdminPageContent() {
             )}
           </button>
         ))}
-      </nav>
+      </div>
 
       {/* Tab content */}
-      {activeTab === 'articles' && <ArticlesManager />}
-      {activeTab === 'about' && <AboutManager />}
-      {activeTab === 'files' && <FilesManager />}
+      <div id="tabpanel-articles" role="tabpanel" aria-labelledby="tab-articles" hidden={activeTab !== 'articles'}>
+        <ArticlesManager />
+      </div>
+      <div id="tabpanel-about" role="tabpanel" aria-labelledby="tab-about" hidden={activeTab !== 'about'}>
+        <AboutManager />
+      </div>
+      <div id="tabpanel-files" role="tabpanel" aria-labelledby="tab-files" hidden={activeTab !== 'files'}>
+        <FilesManager />
+      </div>
     </div>
   );
 }

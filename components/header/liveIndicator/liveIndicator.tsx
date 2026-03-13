@@ -111,7 +111,7 @@ export default function LiveIndicator({ streams, status }: LiveIndicatorProps) {
             rel="noopener noreferrer"
             aria-label={`${platformLabel} — ${isLive ? 'Live now' : 'Offline'}`}
             className={cn(
-              'inline-flex items-center justify-center p-1 rounded-md',
+              'inline-flex items-center justify-center p-2.5 -m-1.5 rounded-md',
               'transition-colors duration-200',
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
               isLive

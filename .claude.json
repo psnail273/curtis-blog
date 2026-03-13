@@ -12,14 +12,14 @@
     "status-line": 7,
     "prompt-queue": 8,
     "enter-to-steer-in-relatime": 28,
-    "todo-list": 9,
-    "install-github-app": 19,
-    "install-slack-app": 19,
+    "todo-list": 29,
+    "install-github-app": 29,
+    "install-slack-app": 29,
     "drag-and-drop-images": 20,
     "double-esc-code-restore": 20,
     "continue": 20,
     "shift-tab": 20,
-    "image-paste": 9,
+    "image-paste": 29,
     "custom-agents": 24,
     "agent-flag": 24,
     "web-app": 24,
@@ -28,7 +28,7 @@
     "permissions": 21,
     "rename-conversation": 26,
     "custom-commands": 26,
-    "frontend-design-plugin": 16,
+    "frontend-design-plugin": 29,
     "feedback-command": 18
   },
   "promptQueueUseCount": 134,
@@ -328,6 +328,38 @@
     "impeccable:frontend-design": {
       "usageCount": 1,
       "lastUsedAt": 1773356304885
+    },
+    "harden": {
+      "usageCount": 1,
+      "lastUsedAt": 1773356771006
+    },
+    "adapt": {
+      "usageCount": 1,
+      "lastUsedAt": 1773356892830
+    },
+    "normalize": {
+      "usageCount": 1,
+      "lastUsedAt": 1773357267198
+    },
+    "clarify": {
+      "usageCount": 1,
+      "lastUsedAt": 1773359144138
+    },
+    "optimize": {
+      "usageCount": 1,
+      "lastUsedAt": 1773360595601
+    },
+    "quieter": {
+      "usageCount": 1,
+      "lastUsedAt": 1773360674377
+    },
+    "bolder": {
+      "usageCount": 1,
+      "lastUsedAt": 1773360723132
+    },
+    "delight": {
+      "usageCount": 1,
+      "lastUsedAt": 1773361779523
     }
   },
   "showSpinnerTree": false,
@@ -347,5 +379,8 @@
   "anonymousId": "claudecode.v1.e10b2d5e-3160-4e8d-a3e5-b6891613d705",
   "voiceNoticeSeenCount": 3,
   "effortCalloutV2Dismissed": true,
-  "hasUsedBackslashReturn": true
+  "hasUsedBackslashReturn": true,
+  "feedbackSurveyState": {
+    "lastShownTime": 1773360816951
+  }
 }

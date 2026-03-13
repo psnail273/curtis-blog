@@ -42,7 +42,7 @@ function ArticleContent({ data }: { data: Article }) {
 function StreamContent({ data }: { data: PastStream }) {
   const platformColors = data.platform === 'twitch'
     ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
-    : 'bg-red-500/10 text-red-600 dark:text-red-400';
+    : 'bg-live/10 text-live';
 
   return (
     <>

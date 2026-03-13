@@ -66,6 +66,7 @@ export default function Support() {
               rel="noopener noreferrer"
             >
               Support on Patreon
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>
           </Button>
           <p className="text-sm text-caption">

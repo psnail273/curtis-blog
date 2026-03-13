@@ -98,7 +98,7 @@ export function CommentForm({
         {userImage ? (
           <Image
             src={userImage}
-            alt=""
+            alt={`${userName}'s avatar`}
             width={32}
             height={32}
             className="rounded-full border border-border"
@@ -116,7 +116,11 @@ export function CommentForm({
       </div>
 
       {/* Textarea */}
+      <label htmlFor={`comment-input-${parentId ?? 'root'}`} className="sr-only">
+        {replyingToName ? `Reply to ${replyingToName}` : 'Your comment'}
+      </label>
       <textarea
+        id={`comment-input-${parentId ?? 'root'}`}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={replyingToName ? `Reply to ${replyingToName}...` : 'Share your thoughts...'}
@@ -128,7 +132,6 @@ export function CommentForm({
           parentId ? 'min-h-[60px] max-h-[150px]' : 'min-h-[80px] max-h-[200px]',
         )}
         disabled={isSubmitting}
-        aria-label="Comment text"
       />
 
       {/* Error message */}

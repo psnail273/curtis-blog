@@ -27,6 +27,13 @@ export function SearchResults({
 }: SearchResultsProps) {
   const totalResults = articles.length + streams.length + files.length;
 
+  // Screen reader announcement for dynamic result count
+  const announcement = !hasQuery
+    ? ''
+    : totalResults === 0
+      ? `No results found for ${query}`
+      : `${totalResults} result${totalResults !== 1 ? 's' : ''} found`;
+
   if (isLoading) {
     return (
       <div className="px-4 py-8 text-center" role="status" aria-label="Loading search data">
@@ -59,6 +66,10 @@ export function SearchResults({
   let flatIndex = 0;
 
   return (
+    <>
+    <div className="sr-only" aria-live="polite" aria-atomic="true">
+      {announcement}
+    </div>
     <div
       role="listbox"
       aria-label="Search results"
@@ -112,5 +123,6 @@ export function SearchResults({
         </SearchResultGroup>
       )}
     </div>
+    </>
   );
 }

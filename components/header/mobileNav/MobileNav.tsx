@@ -226,14 +226,14 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
               pathname === '/streams'
                 ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                 : isAnyLive
-                  ? 'text-red-500 animate-nav-live-pulse hover:bg-accent/10'
+                  ? 'text-live animate-nav-live-pulse hover:bg-accent/10'
                   : 'text-muted hover:bg-accent/10 hover:text-accent'
             )}
             aria-current={pathname === '/streams' ? 'page' : undefined}
           >
             <span className="inline-flex items-center gap-1.5">
               {isAnyLive && (
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-live-dot-pulse" aria-hidden="true" />
+                <span className="w-1.5 h-1.5 rounded-full bg-live animate-live-dot-pulse" aria-hidden="true" />
               )}
               Streams
             </span>

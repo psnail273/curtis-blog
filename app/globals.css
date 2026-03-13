@@ -16,6 +16,10 @@
   --accent-hover: #9C4628;
   --accent-secondary: #D4A84B;
 
+  /* Live/streaming status */
+  --live: #DC2626;
+  --live-muted: #F87171;
+
   /* Typography */
   --text-body: #374151;
   --text-muted: #6B7280;
@@ -87,6 +91,10 @@
     --accent-hover: #B5522F;
     --accent-secondary: #E8B84A;
 
+    /* Live/streaming status */
+    --live: #EF4444;
+    --live-muted: #FCA5A5;
+
     /* Typography */
     --text-body: #E5E7EB;
     --text-muted: #9CA3AF;
@@ -134,6 +142,11 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-secondary: var(--accent-secondary);
+
+  /* Live status
+     Usage: bg-live, text-live, border-live, text-live-muted */
+  --color-live: var(--live);
+  --color-live-muted: var(--live-muted);
 
   /* Typography colors
      Usage: text-body, text-muted, text-caption */
@@ -373,7 +386,7 @@
   }
 
   .font-terminal {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', Menlo, Consolas, monospace;
     font-variant-ligatures: none;
     letter-spacing: -0.02em;
   }
@@ -439,11 +452,17 @@
   .category-color-bg { background-color: var(--cat-color-light); }
   .category-bg { background-color: var(--cat-bg-light); }
   .category-hover-border:hover { border-color: var(--cat-color-light); }
+  .category-hover-edge {
+    border-left: 2px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+  .category-hover-edge:hover { border-left-color: var(--cat-color-light); }
   @media (prefers-color-scheme: dark) {
     .category-color { color: var(--cat-color-dark); }
     .category-color-bg { background-color: var(--cat-color-dark); }
     .category-bg { background-color: var(--cat-bg-dark); }
     .category-hover-border:hover { border-color: var(--cat-color-dark); }
+    .category-hover-edge:hover { border-left-color: var(--cat-color-dark); }
   }
 }
 
@@ -594,13 +613,13 @@
    Micro-interaction Animations
    ============================================= */
 
-/* Live pulse glow -- a subtle red/accent glow that pulses on live streaming cards */
+/* Live pulse glow -- a subtle glow that pulses on live streaming cards */
 @keyframes live-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 40%, transparent);
   }
   50% {
-    box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.15);
+    box-shadow: 0 0 12px 4px color-mix(in srgb, var(--live) 15%, transparent);
   }
 }
 
@@ -638,19 +657,21 @@
   }
 }
 
-/* Nav link live pulse -- subtle text color pulse for "Streams" when live */
+/* Nav link live pulse -- gentle opacity fade for "Streams" when live.
+   The dot indicator already signals live status; the text just needs a
+   quiet hint, not a dramatic color swing. */
 @keyframes nav-live-pulse {
   0%, 100% {
-    color: #ef4444; /* red-500 */
+    opacity: 1;
   }
   50% {
-    color: #fca5a5; /* red-300 — lighter pulse target */
+    opacity: 0.6;
   }
 }
 
 /* Utility classes for animations */
 .animate-nav-live-pulse {
-  animation: nav-live-pulse 2s ease-in-out infinite;
+  animation: nav-live-pulse 3s ease-in-out infinite;
 }
 
 .animate-live-pulse {

@@ -22,7 +22,7 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
           'flex flex-col sm:flex-row border border-border rounded-lg overflow-hidden',
           'transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
           'hover:shadow-warm-hover',
-          'bg-card category-hover-border'
+          'bg-card category-hover-border category-hover-edge'
         )}
         style={getCategoryStyle(article.category)}
       >

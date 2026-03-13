@@ -42,15 +42,15 @@ function LiveStreamCard({ stream, streamStatus }: { stream: StreamConfig; stream
     <div
       className={cn(
         'py-8 md:py-10 px-6 md:px-10 text-center',
-        'border-2 border-red-500 rounded-lg',
-        'bg-red-500/10',
+        'border-2 border-live rounded-lg',
+        'bg-live/10',
         'animate-live-pulse'
       )}
     >
       {/* Live badge */}
       <div className="flex items-center justify-center gap-2 mb-3">
-        <span className="w-2 h-2 rounded-full bg-red-500 animate-live-dot-pulse" aria-hidden="true" />
-        <span className="text-red-500 text-sm font-bold uppercase tracking-wide">
+        <span className="w-2 h-2 rounded-full bg-live animate-live-dot-pulse" aria-hidden="true" />
+        <span className="text-live text-sm font-bold uppercase tracking-wide">
           Live
         </span>
       </div>

@@ -23,7 +23,7 @@ export function FileList({ files, onFileClick }: FileListProps) {
             type="button"
             onClick={() => onFileClick(file.id)}
             aria-label={`View file details: ${file.name}`}
-            className="group block w-full text-left rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer"
+            className="group block w-full text-left rounded-lg min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer"
           >
             <div className="flex items-start gap-4">
               {/* File type icon */}

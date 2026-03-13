@@ -19,6 +19,16 @@ const ARTICLE_LIMIT = 5;
 const STREAM_LIMIT = 3;
 const FILE_LIMIT = 3;
 
+// Module-level cache so data persists across modal open/close cycles.
+// Avoids refetching all articles/streams/files every time the user opens search.
+const CACHE_TTL = 60_000; // 1 minute
+let searchCache: {
+  articles: Article[];
+  streams: PastStream[];
+  files: FileRecord[];
+  fetchedAt: number;
+} | null = null;
+
 export function SearchModal({ onClose }: SearchModalProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -49,8 +59,16 @@ export function SearchModal({ onClose }: SearchModalProps) {
     };
   }, []);
 
-  // Fetch all data on mount
+  // Fetch all data on mount, reusing cached results when fresh
   useEffect(() => {
+    if (searchCache && Date.now() - searchCache.fetchedAt < CACHE_TTL) {
+      setAllArticles(searchCache.articles);
+      setAllStreams(searchCache.streams);
+      setAllFiles(searchCache.files);
+      setIsLoading(false);
+      return;
+    }
+
     async function fetchData() {
       setIsLoading(true);
       const [articlesRes, filesRes, streamsRes] = await Promise.all([
@@ -59,9 +77,15 @@ export function SearchModal({ onClose }: SearchModalProps) {
         fetch('/api/streams').then((r) => r.ok ? r.json() : { streams: [] }).catch(() => ({ streams: [] })),
       ]);
 
-      setAllArticles(Array.isArray(articlesRes) ? articlesRes : []);
-      setAllFiles(Array.isArray(filesRes) ? filesRes : []);
-      setAllStreams(streamsRes?.streams ?? []);
+      const articles = Array.isArray(articlesRes) ? articlesRes : [];
+      const files = Array.isArray(filesRes) ? filesRes : [];
+      const streams = streamsRes?.streams ?? [];
+
+      searchCache = { articles, streams, files, fetchedAt: Date.now() };
+
+      setAllArticles(articles);
+      setAllFiles(files);
+      setAllStreams(streams);
       setIsLoading(false);
     }
 
@@ -186,7 +210,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
     <div className="fixed inset-0 z-50" role="presentation">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
