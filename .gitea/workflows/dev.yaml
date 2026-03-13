@@ -120,6 +120,9 @@ jobs:
             -e CLOUDINARY_API_KEY="${{ secrets.CLOUDINARY_API_KEY }}" \
             -e CLOUDINARY_API_SECRET="${{ secrets.CLOUDINARY_API_SECRET }}" \
             -e CLOUDINARY_FOLDER="${{ secrets.CLOUDINARY_FOLDER }}" \
+            -e NEXT_PUBLIC_TWITCH_USERNAME="${{ secrets.TWITCH_USERNAME }}" \
+            -e NEXT_PUBLIC_YOUTUBE_CHANNEL_ID="${{ secrets.YOUTUBE_CHANNEL_ID }}" \
+            -e NEXT_PUBLIC_YOUTUBE_HANDLE="${{ secrets.YOUTUBE_HANDLE }}" \
             -e AUTH_TRUST_HOST=true \
             -e AUTH_URL=https://curtis.stuffworks.net \
             "$IMAGE"

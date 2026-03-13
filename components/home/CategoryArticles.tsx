@@ -40,7 +40,7 @@ export function CategoryArticles({
             : 'flex flex-col'
         )}
         style={restArticles.length > 0 ? {
-          gridTemplateRows: `repeat(${restArticles.length}, 1fr)`
+          gridTemplateRows: `repeat(${restArticles.length}, auto)`
         } as React.CSSProperties : undefined}
       >
         {/* Featured (most recent) article — spans all rows */}
@@ -70,7 +70,7 @@ export function CategoryArticles({
             'category-color hover:underline transition-colors self-end'
           )}
         >
-          View all {category.toLowerCase()} articles
+          View All {category} Articles
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       )}

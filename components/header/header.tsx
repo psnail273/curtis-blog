@@ -79,7 +79,6 @@ export default function Header({ categories }: HeaderProps) {
 
           {/* Mobile: search + hamburger — absolute positioned on right */}
           <div className="lg:hidden absolute right-4 flex items-center gap-1">
-            <SearchTrigger />
             <HamburgerButton
               ref={hamburgerRef}
               isOpen={isMobileMenuOpen}

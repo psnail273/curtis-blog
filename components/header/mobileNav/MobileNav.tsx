@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
+import { SearchTrigger } from '@/components/search/SearchTrigger';
 
 
 interface MobileNavProps {
@@ -157,6 +158,15 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
+        {/* Search */}
+        <div className="flex items-center px-4 py-2">
+          <SearchTrigger />
+          <span className="ml-2 text-base font-sans text-muted">Search</span>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
         {/* Category links section (primary) */}
         <nav className="flex flex-col gap-3" aria-label="Categories">
           <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
