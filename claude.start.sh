@@ -51,10 +51,12 @@ MOUNT_ARGS=(
     -v "$(pwd):/workspaces:z"
 )
 
-# Mount ~/.claude user-level config (auth/credentials) — uses a separate dir
-# from the project's .claude/ to avoid skills appearing twice.
-mkdir -p ".claude-home"
-MOUNT_ARGS+=(-v "$(pwd)/.claude-home:/home/node/.claude:z")
+# Mount host ~/.claude user-level config (auth, credentials, settings)
+if [[ ! -d "$HOME/.claude" ]]; then
+    echo "Error: ~/.claude not found. Run 'claude' on the host first to initialize." >&2
+    exit 1
+fi
+MOUNT_ARGS+=(-v "$HOME/.claude:/home/node/.claude:z")
 
 # Mount .claude.json so auth config persists across sessions
 [[ -s ".claude.json" ]] || echo '{}' > ".claude.json"
