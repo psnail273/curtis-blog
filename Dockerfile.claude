@@ -25,4 +25,4 @@ USER node
 
 WORKDIR /workspaces
 
-ENTRYPOINT ["/bin/bash", "-c", "exec claude --dangerously-skip-permissions \"$@\"", "--"]
+ENTRYPOINT ["/bin/bash", "-c", "exec claude \"$@\"", "--"]
