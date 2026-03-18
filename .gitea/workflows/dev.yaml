@@ -51,9 +51,9 @@ jobs:
             git.stuffworks.net/psnail273/curtis-blog-dev:${{ steps.version.outputs.VERSION }}
             git.stuffworks.net/psnail273/curtis-blog-dev:latest
           build-args: |
-            NEXT_PUBLIC_TWITCH_USERNAME=${{ secrets.TWITCH_USERNAME }}
-            NEXT_PUBLIC_YOUTUBE_CHANNEL_ID=${{ secrets.YOUTUBE_CHANNEL_ID }}
-            NEXT_PUBLIC_YOUTUBE_HANDLE=${{ secrets.YOUTUBE_HANDLE }}
+            NEXT_PUBLIC_TWITCH_USERNAME=${{ secrets.NEXT_PUBLIC_TWITCH_USERNAME }}
+            NEXT_PUBLIC_YOUTUBE_CHANNEL_ID=${{ secrets.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID }}
+            NEXT_PUBLIC_YOUTUBE_HANDLE=${{ secrets.NEXT_PUBLIC_YOUTUBE_HANDLE }}
           secrets: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             AUTH_SECRET=${{ secrets.AUTH_SECRET }}
@@ -120,9 +120,9 @@ jobs:
             -e CLOUDINARY_API_KEY="${{ secrets.CLOUDINARY_API_KEY }}" \
             -e CLOUDINARY_API_SECRET="${{ secrets.CLOUDINARY_API_SECRET }}" \
             -e CLOUDINARY_FOLDER="${{ secrets.CLOUDINARY_FOLDER }}" \
-            -e NEXT_PUBLIC_TWITCH_USERNAME="${{ secrets.TWITCH_USERNAME }}" \
-            -e NEXT_PUBLIC_YOUTUBE_CHANNEL_ID="${{ secrets.YOUTUBE_CHANNEL_ID }}" \
-            -e NEXT_PUBLIC_YOUTUBE_HANDLE="${{ secrets.YOUTUBE_HANDLE }}" \
+            -e NEXT_PUBLIC_TWITCH_USERNAME="${{ secrets.NEXT_PUBLIC_TWITCH_USERNAME }}" \
+            -e NEXT_PUBLIC_YOUTUBE_CHANNEL_ID="${{ secrets.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID }}" \
+            -e NEXT_PUBLIC_YOUTUBE_HANDLE="${{ secrets.NEXT_PUBLIC_YOUTUBE_HANDLE }}" \
             -e AUTH_TRUST_HOST=true \
             -e AUTH_URL=https://curtis.stuffworks.net \
             "$IMAGE"
