@@ -1,0 +1,28 @@
+# Ignore everything by default
+*
+
+# Allow files needed for the build
+!package.json
+!package-lock.json*
+!next.config.ts
+!tsconfig.json
+!postcss.config.mjs
+!components.json
+!drizzle.config.ts
+!middleware.ts
+!eslint.config.mjs
+
+# Allow source directories
+!app/
+!components/
+!contexts/
+!db/
+!drizzle/
+!hooks/
+!lib/
+!public/
+!types/
+
+# Still ignore node_modules even within allowed dirs
+node_modules/
+.next/

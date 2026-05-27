@@ -1,0 +1,130 @@
+name: Build and Deploy Docker Container
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+          # Calculate previous version for cleanup
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          PREV_PATCH=$((PATCH - 1))
+          if [ "$PREV_PATCH" -ge 0 ]; then
+            echo "PREV_VERSION=${MAJOR}.${MINOR}.${PREV_PATCH}" >> "$GITHUB_OUTPUT"
+          else
+            echo "PREV_VERSION=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Private Registry
+        uses: docker/login-action@v2
+        with:
+          registry: git.stuffworks.net
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            git.stuffworks.net/psnail273/curtis-blog-dev:${{ steps.version.outputs.VERSION }}
+            git.stuffworks.net/psnail273/curtis-blog-dev:latest
+          build-args: |
+            NEXT_PUBLIC_TWITCH_USERNAME=${{ secrets.NEXT_PUBLIC_TWITCH_USERNAME }}
+            NEXT_PUBLIC_YOUTUBE_CHANNEL_ID=${{ secrets.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID }}
+            NEXT_PUBLIC_YOUTUBE_HANDLE=${{ secrets.NEXT_PUBLIC_YOUTUBE_HANDLE }}
+          secrets: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            AUTH_SECRET=${{ secrets.AUTH_SECRET }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            TWITCH_CLIENT_ID=${{ secrets.TWITCH_CLIENT_ID }}
+            TWITCH_CLIENT_SECRET=${{ secrets.TWITCH_CLIENT_SECRET }}
+            YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}
+            CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+            CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+            CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+            CLOUDINARY_FOLDER=${{ secrets.CLOUDINARY_FOLDER }}
+          cache-from: type=registry,ref=git.stuffworks.net/psnail273/curtis-blog-dev:latest
+          cache-to: type=inline
+
+      - name: Delete previous version from registry
+        if: steps.version.outputs.PREV_VERSION != ''
+        continue-on-error: true
+        run: |
+          PREV_VERSION="${{ steps.version.outputs.PREV_VERSION }}"
+          echo "Attempting to delete version ${PREV_VERSION} from registry..."
+
+          # List package versions and find the one matching PREV_VERSION
+          PACKAGE_ID=$(curl -s \
+            -H "Authorization: token ${{ secrets.REGISTRY_TOKEN }}" \
+            "https://git.stuffworks.net/api/v1/packages/psnail273?type=container&q=curtis-blog-dev" \
+            | jq -r ".[] | select(.version == \"${PREV_VERSION}\") | .id")
+
+          if [ -n "$PACKAGE_ID" ] && [ "$PACKAGE_ID" != "null" ]; then
+            curl -s -X DELETE \
+              -H "Authorization: token ${{ secrets.REGISTRY_TOKEN }}" \
+              "https://git.stuffworks.net/api/v1/packages/psnail273/${PACKAGE_ID}"
+            echo "Deleted version ${PREV_VERSION} (package ID: ${PACKAGE_ID})"
+          else
+            echo "Previous version ${PREV_VERSION} not found in registry, skipping"
+          fi
+
+      - name: Deploy container
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          IMAGE="git.stuffworks.net/psnail273/curtis-blog-dev:${VERSION}"
+
+          docker pull "$IMAGE"
+          docker stop curtis-blog-dev || true
+          docker rm curtis-blog-dev || true
+
+          # Remove dangling images to free disk space
+          docker image prune -f
+
+          docker run -d \
+            --name curtis-blog-dev \
+            --restart unless-stopped \
+            --network caddy-network \
+            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -e AUTH_SECRET="${{ secrets.AUTH_SECRET }}" \
+            -e ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            -e TWITCH_CLIENT_ID="${{ secrets.TWITCH_CLIENT_ID }}" \
+            -e TWITCH_CLIENT_SECRET="${{ secrets.TWITCH_CLIENT_SECRET }}" \
+            -e YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}" \
+            -e CLOUDINARY_CLOUD_NAME="${{ secrets.CLOUDINARY_CLOUD_NAME }}" \
+            -e CLOUDINARY_API_KEY="${{ secrets.CLOUDINARY_API_KEY }}" \
+            -e CLOUDINARY_API_SECRET="${{ secrets.CLOUDINARY_API_SECRET }}" \
+            -e CLOUDINARY_FOLDER="${{ secrets.CLOUDINARY_FOLDER }}" \
+            -e NEXT_PUBLIC_TWITCH_USERNAME="${{ secrets.NEXT_PUBLIC_TWITCH_USERNAME }}" \
+            -e NEXT_PUBLIC_YOUTUBE_CHANNEL_ID="${{ secrets.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID }}" \
+            -e NEXT_PUBLIC_YOUTUBE_HANDLE="${{ secrets.NEXT_PUBLIC_YOUTUBE_HANDLE }}" \
+            -e AUTH_TRUST_HOST=true \
+            -e AUTH_URL=https://curtis.stuffworks.net \
+            "$IMAGE"
+
+          echo "Deployed version ${VERSION}"

@@ -1,86 +1,192 @@
+export const dynamic = 'force-dynamic';
+
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { mockArticles } from '@/lib/mock-articles';
+import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
+import { getDb } from '@/lib/db';
+import type { ArticleRow } from '@/lib/article-utils';
+import { isAdminAuthenticated } from '@/lib/admin-auth';
+import { formatDateLong } from '@/lib/format-utils';
+import { ArticleContent } from '@/components/articles/ArticleContent';
+import { CommentsSection } from '@/components/comments/CommentsSection';
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
 }
 
-function formatDate(dateString: string): string {
+async function getArticleBySlug(slug: string): Promise<ArticleRow | null> {
   try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch {
-    return dateString;
+    const sql = getDb();
+    const rows = await sql`
+      SELECT * FROM articles WHERE slug = ${slug}
+    ` as ArticleRow[];
+    return rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error('Error fetching article:', error);
+    return null;
   }
+}
+
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
+
+  if (!article) {
+    return {
+      title: 'Article Not Found',
+      description: 'The requested article could not be found.',
+      robots: { index: false, follow: true },
+    };
+  }
+
+  const description = article.excerpt || article.content.substring(0, 160);
+
+  return {
+    title: article.title,
+    description,
+    ...(article.status === 'draft' && { robots: { index: false, follow: false } }),
+    openGraph: {
+      title: article.title,
+      description,
+      url: `/articles/${article.slug}`,
+      type: 'article',
+      publishedTime: article.published_at ?? undefined,
+      authors: [article.author],
+      tags: [article.category],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description,
+    },
+  };
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = mockArticles.find((a) => a.slug === slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     notFound();
   }
 
+  // Draft articles require admin authentication
+  const isDraft = article.status !== 'published';
+  if (isDraft) {
+    const isAdmin = await isAdminAuthenticated();
+    if (!isAdmin) {
+      notFound();
+    }
+  }
+
   return (
-    <article>
+    <article className="max-w-3xl mx-auto">
+      {/* Draft preview banner — admin only */}
+      {isDraft && (
+        <div className="mb-6">
+          <div className="px-4 py-3 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 text-sm font-medium">
+            You are previewing a draft. This article is not published.
+          </div>
+        </div>
+      )}
+
       <Link
-        href="/articles"
-        className="inline-flex items-center gap-2 text-muted mb-6 text-sm hover:text-accent"
+        href="/"
+        className="inline-flex items-center gap-2 text-muted hover:text-accent mb-8 text-sm transition-all duration-200 hover:translate-x-[-4px]"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m12 19-7-7 7-7" />
-          <path d="M19 12H5" />
-        </svg>
+        <ArrowLeft size={16} aria-hidden="true" />
         Back to articles
       </Link>
 
-      <header className="mb-8">
-        <div className="flex items-center gap-3 text-sm text-muted mb-4">
-          <span className="px-2 py-1 bg-[var(--accent-bg)] text-accent rounded-md text-xs font-medium">
-            {article.category}
-          </span>
-          <span>{article.readTime} min read</span>
+      {/* Cover Image — fills container width, natural aspect ratio */}
+      {article.cover_image && (
+        <div className="mb-8 md:mb-12">
+          <Image
+            src={article.cover_image}
+            alt={article.title}
+            width={768}
+            height={432}
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="w-full h-auto rounded-lg"
+          />
         </div>
+      )}
 
-        <h1 className="mb-4">{article.title}</h1>
+      <header className="mb-8 md:mb-12">
+        <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-[-0.02em] text-foreground mb-5 md:mb-6">
+          {article.title}
+        </h1>
 
-        <div className="flex items-center gap-2 text-muted">
-          <span className="font-medium text-foreground">{article.author}</span>
-          <span>·</span>
-          <time dateTime={article.publishedAt}>
-            {formatDate(article.publishedAt)}
-          </time>
+        {/* Dek — excerpt as subtitle if available */}
+        {article.excerpt && (
+          <p className="font-serif text-lg md:text-xl text-muted leading-relaxed mb-6 md:mb-8">
+            {article.excerpt}
+          </p>
+        )}
+
+        {/* Byline — editorial style */}
+        <div className="flex items-center gap-3 pt-5 border-t border-border">
+          <div className="flex flex-col">
+            <span className="font-sans text-sm font-semibold text-foreground tracking-wide">
+              By {article.author}
+            </span>
+            <div className="flex items-center gap-2 text-caption text-xs mt-0.5">
+              <time dateTime={article.published_at ?? undefined}>
+                {formatDateLong(article.published_at)}
+              </time>
+              <span aria-hidden="true">&middot;</span>
+              <span>{article.read_time} min read</span>
+            </div>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-none">
-        {article.content.split('\n\n').map((paragraph, index) => (
-          <p key={index} className="mb-4 text-body leading-7">
-            {paragraph}
-          </p>
-        ))}
-      </div>
+      {/* Article body — Markdown rendered */}
+      <ArticleContent content={article.content} />
+
+      {/* Separator */}
+      <hr className="border-t border-border my-[var(--section-gap-mobile)] md:my-[var(--section-gap)]" />
+
+      {/* Comments Section */}
+      <Suspense fallback={<CommentsSkeleton />}>
+        <CommentsSection slug={slug} />
+      </Suspense>
     </article>
   );
 }
 
+function CommentsSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-6 w-36 bg-border rounded mb-6" />
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex gap-3">
+            <div className="h-8 w-8 bg-border rounded-full shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-24 bg-border rounded" />
+              <div className="h-4 w-full bg-border rounded" />
+              <div className="h-4 w-2/3 bg-border rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export async function generateStaticParams() {
-  return mockArticles.map((article) => ({
-    slug: article.slug,
-  }));
+  try {
+    const sql = getDb();
+    const rows = await sql`
+      SELECT slug FROM articles WHERE status = 'published'
+    ` as { slug: string }[];
+    return rows.map((row) => ({ slug: row.slug }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
 }

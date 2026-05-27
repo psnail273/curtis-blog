@@ -1,45 +1,157 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import SearchBox from '@/components/search/SearchBox';
-import LiveIndicator from './liveIndicator/liveIndicator';
-import { useLiveStatus } from '@/contexts/LiveStatusContext';
+import { usePathname, useSearchParams } from 'next/navigation';
 
-export default function Header() {
-  const { isAnyLive, isLoading } = useLiveStatus();
+import { cn } from '@/lib/utils';
+import { useLiveStatus } from '@/contexts/LiveStatusContext';
+import { useAdminStatus } from '@/lib/hooks/use-admin-status';
+import { SearchTrigger } from '@/components/search/SearchTrigger';
+import HamburgerButton from './hamburgerButton/HamburgerButton';
+import MobileNav from './mobileNav/MobileNav';
+
+function NavLink({
+  href,
+  isActive,
+  children,
+}: {
+  href: string;
+  isActive: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+        'transition-colors duration-200',
+        isActive ? 'text-accent font-bold' : 'text-secondary hover:text-accent'
+      )}
+      aria-current={isActive ? 'page' : undefined}
+    >
+      {children}
+    </Link>
+  );
+}
+
+interface HeaderProps {
+  categories: string[];
+}
+
+export default function Header({ categories }: HeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const { isAnyLive } = useLiveStatus();
+  const { isAdmin } = useAdminStatus();
+
+  const activeCategory = pathname === '/' ? searchParams.get('category') : null;
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape' && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileMenuOpen]);
 
   return (
-    <header className="flex items-center justify-between w-full border-b border-border mb-6 overflow-x-hidden px-4 py-3 md:px-8 md:py-4 xl:px-[clamp(2rem,5vw,4rem)]">
-      {/* Left section: Logo */}
-      <div className="flex items-center shrink-0">
-        <Link
-          href="/"
-          className="text-[clamp(1.25rem,4vw,1.5rem)] font-semibold font-serif text-foreground transition-colors duration-200 whitespace-nowrap hover:text-accent"
-        >
-          Curtis Israel
-        </Link>
-      </div>
+    <>
+      <header className="w-full border-b border-border mb-6">
+        {/* Top Tier: Centered Masthead */}
+        <div className="flex items-center justify-center py-4 md:py-6 px-4 md:px-8 relative">
+          {/* Centered masthead */}
+          <Link
+            href="/"
+            className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground tracking-tight uppercase hover:text-accent transition-colors"
+          >
+            Curtis Israel
+          </Link>
 
-      {/* Center section: Nav links + Live indicator */}
-      <div className="flex items-center justify-center gap-4 flex-1">
-        <nav className="flex items-center gap-[clamp(1rem,3vw,2rem)] sm:gap-[clamp(2rem,5vw,4rem)]">
-          <Link href="/" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
-            Home
-          </Link>
-          <Link href="/articles" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
-            Articles
-          </Link>
-          <Link href="/about" className="nav-link uppercase text-[clamp(0.75rem,2vw,0.875rem)] tracking-[0.05em] font-medium text-secondary transition-colors duration-200 whitespace-nowrap hover:text-accent">
-            About
-          </Link>
-          <LiveIndicator isAnyLive={isAnyLive} isLoading={isLoading} />
-        </nav>
-      </div>
+          {/* Mobile: search + hamburger — absolute positioned on right */}
+          <div className="lg:hidden absolute right-4 flex items-center gap-1">
+            <HamburgerButton
+              ref={hamburgerRef}
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+            />
+          </div>
+        </div>
 
-      {/* Right section: Search */}
-      <div className="flex items-center shrink-0">
-        <SearchBox />
-      </div>
-    </header>
+        {/* Bottom Tier: Navigation Bar (desktop only) */}
+        <div className="hidden lg:flex items-center justify-center relative border-t border-border px-4 md:px-8">
+          <nav className="flex items-center gap-6 py-3" aria-label="Main navigation">
+            <NavLink href="/" isActive={activeCategory === null && pathname === '/'}>
+              All
+            </NavLink>
+
+            {categories.map((category) => (
+              <NavLink
+                key={category}
+                href={`/?category=${encodeURIComponent(category)}`}
+                isActive={activeCategory === category}
+              >
+                {category}
+              </NavLink>
+            ))}
+
+            {/* Divider */}
+            <div className="w-px h-5 bg-border" aria-hidden="true" />
+
+            {/* Streams link — special case with live pulse animation */}
+            <Link
+              href="/streams"
+              className={cn(
+                'nav-link relative uppercase text-sm md:text-base tracking-wide font-medium whitespace-nowrap pb-1',
+                'transition-colors duration-200',
+                pathname === '/streams'
+                  ? 'text-accent font-bold'
+                  : isAnyLive
+                    ? 'text-live animate-nav-live-pulse'
+                    : 'text-secondary hover:text-accent'
+              )}
+              aria-current={pathname === '/streams' ? 'page' : undefined}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                {isAnyLive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-live animate-live-dot-pulse" aria-hidden="true" />
+                )}
+                Streams
+              </span>
+            </Link>
+
+            <NavLink href="/about" isActive={pathname === '/about'}>About</NavLink>
+            <NavLink href="/files" isActive={pathname === '/files'}>Files</NavLink>
+            <NavLink href="/support" isActive={pathname === '/support'}>Support</NavLink>
+            {isAdmin && (
+              <NavLink href="/admin" isActive={pathname === '/admin'}>Admin</NavLink>
+            )}
+          </nav>
+
+          {/* Right side: search */}
+          <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <SearchTrigger />
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile navigation panel */}
+      <MobileNav
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        hamburgerButtonRef={hamburgerRef}
+        categories={categories}
+        isAdmin={isAdmin}
+      />
+    </>
   );
 }
