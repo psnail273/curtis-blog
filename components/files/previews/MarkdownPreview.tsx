@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeSlug from 'rehype-slug';
 import { FileIcon } from '@/components/files/FileIcon';
 import type { FileRecord } from '@/types/file';
 
@@ -95,7 +96,7 @@ export function MarkdownPreview({ file }: MarkdownPreviewProps) {
         </span>
       </div>
       <div className="p-4 md:p-6 overflow-y-auto max-h-[400px] markdown-preview">
-        <ReactMarkdown>{content}</ReactMarkdown>
+        <ReactMarkdown rehypePlugins={[rehypeSlug]}>{content}</ReactMarkdown>
       </div>
     </div>
   );

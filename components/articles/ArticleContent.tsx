@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
 import Image from 'next/image';
 
 interface ArticleContentProps {
@@ -11,6 +12,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
     <div className="article-prose prose-content">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeSlug]}
         components={{
           img: ({ src, alt }) => {
             if (!src || typeof src !== 'string') return null;
