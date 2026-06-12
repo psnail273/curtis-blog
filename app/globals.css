@@ -609,6 +609,11 @@
   height: auto;
 }
 
+/* GFM footnote scroll targets — prevent overlap with sticky header if added later */
+[id^="user-content-fn"] {
+  scroll-margin-top: 6rem;
+}
+
 /* =============================================
    Micro-interaction Animations
    ============================================= */
