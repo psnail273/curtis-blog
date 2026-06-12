@@ -13,6 +13,10 @@ export function ArticleContent({ content }: ArticleContentProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSlug]}
+        remarkRehypeOptions={{
+          footnoteLabel: "References",
+          footnoteBackLabel: "Back to citation",
+        }}
         components={{
           img: ({ src, alt }) => {
             if (!src || typeof src !== 'string') return null;
@@ -39,12 +43,14 @@ export function ArticleContent({ content }: ArticleContentProps) {
               </p>
             );
           },
-          // Links open in new tab for external URLs
-          a: ({ href, children }) => {
+          // Links open in new tab for external URLs; spread props to preserve
+          // remark-gfm id/data-* attrs for footnote back-reference links.
+          a: ({ href, children, ...props }) => {
             const isExternal = href?.startsWith('http');
             return (
               <a
                 href={href}
+                {...props}
                 {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
                 {children}
