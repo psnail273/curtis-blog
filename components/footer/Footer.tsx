@@ -44,11 +44,6 @@ export function Footer() {
                   Files
                 </Link>
               </li>
-              <li>
-                <Link href="/support" className="text-muted hover:text-accent transition-colors">
-                  Support
-                </Link>
-              </li>
             </ul>
           </nav>
 
