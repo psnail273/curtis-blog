@@ -131,7 +131,6 @@ export default function Header({ categories }: HeaderProps) {
 
             <NavLink href="/about" isActive={pathname === '/about'}>About</NavLink>
             <NavLink href="/files" isActive={pathname === '/files'}>Files</NavLink>
-            <NavLink href="/support" isActive={pathname === '/support'}>Support</NavLink>
             {isAdmin && (
               <NavLink href="/admin" isActive={pathname === '/admin'}>Admin</NavLink>
             )}

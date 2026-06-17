@@ -284,52 +284,37 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
           </Link>
         </nav>
 
-        {/* Divider */}
-        <div className="border-t border-border" />
+        {/* More links section — admin only */}
+        {isAdmin && (
+          <>
+            {/* Divider */}
+            <div className="border-t border-border" />
 
-        {/* More links section */}
-        <nav className="flex flex-col gap-2" aria-label="More">
-          <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
-            More
-          </span>
+            <nav className="flex flex-col gap-2" aria-label="More">
+              <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
+                More
+              </span>
 
-          <Link
-            href="/support"
-            onClick={onClose}
-            className={cn(
-              'block w-full text-left px-4 py-2 rounded-lg',
-              'text-base font-sans',
-              'transition-colors duration-200',
-              'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              'min-h-[44px] flex items-center',
-              pathname === '/support'
-                ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
-                : 'text-muted hover:bg-accent/10 hover:text-accent'
-            )}
-            aria-current={pathname === '/support' ? 'page' : undefined}
-          >
-            Support
-          </Link>
-          {isAdmin && (
-            <Link
-              href="/admin"
-              onClick={onClose}
-              className={cn(
-                'block w-full text-left px-4 py-2 rounded-lg',
-                'text-base font-sans',
-                'transition-colors duration-200',
-                'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-                'min-h-[44px] flex items-center',
-                pathname === '/admin'
-                  ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
-                  : 'text-muted hover:bg-accent/10 hover:text-accent'
-              )}
-              aria-current={pathname === '/admin' ? 'page' : undefined}
-            >
-              Admin
-            </Link>
-          )}
-        </nav>
+              <Link
+                href="/admin"
+                onClick={onClose}
+                className={cn(
+                  'block w-full text-left px-4 py-2 rounded-lg',
+                  'text-base font-sans',
+                  'transition-colors duration-200',
+                  'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+                  'min-h-[44px] flex items-center',
+                  pathname === '/admin'
+                    ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
+                    : 'text-muted hover:bg-accent/10 hover:text-accent'
+                )}
+                aria-current={pathname === '/admin' ? 'page' : undefined}
+              >
+                Admin
+              </Link>
+            </nav>
+          </>
+        )}
       </div>
     </>
   );

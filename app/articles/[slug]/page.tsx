@@ -9,7 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import type { ArticleRow } from '@/lib/article-utils';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
-import { formatDateLong } from '@/lib/format-utils';
+import { ArticleByline } from '@/components/articles/ArticleByline';
 import { ArticleContent } from '@/components/articles/ArticleContent';
 import { CommentsSection } from '@/components/comments/CommentsSection';
 
@@ -127,21 +127,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </p>
         )}
 
-        {/* Byline — editorial style */}
-        <div className="flex items-center gap-3 pt-5 border-t border-border">
-          <div className="flex flex-col">
-            <span className="font-sans text-sm font-semibold text-foreground tracking-wide">
-              By {article.author}
-            </span>
-            <div className="flex items-center gap-2 text-caption text-xs mt-0.5">
-              <time dateTime={article.published_at ?? undefined}>
-                {formatDateLong(article.published_at)}
-              </time>
-              <span aria-hidden="true">&middot;</span>
-              <span>{article.read_time} min read</span>
-            </div>
-          </div>
-        </div>
+        {/* Byline — editorial style, with share action */}
+        <ArticleByline
+          author={article.author}
+          publishedAt={article.published_at}
+          readTime={article.read_time}
+        />
       </header>
 
       {/* Article body — Markdown rendered */}
