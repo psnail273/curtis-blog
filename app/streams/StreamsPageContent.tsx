@@ -1,18 +1,18 @@
 'use client';
 
 import { StreamHero } from '@/components/streams/StreamHero';
-import { PastStreamsGrid } from '@/components/streams/PastStreamsGrid';
-import type { PastStream } from '@/lib/services/stream-utils';
+import { PlaylistsSection } from '@/components/streams/PlaylistsSection';
+import type { YouTubePlaylist } from '@/lib/services/stream-utils';
 
 interface StreamsPageContentProps {
-  initialStreams: PastStream[];
+  initialPlaylists: YouTubePlaylist[];
 }
 
-export function StreamsPageContent({ initialStreams }: StreamsPageContentProps) {
+export function StreamsPageContent({ initialPlaylists }: StreamsPageContentProps) {
   return (
     <>
       <StreamHero />
-      <PastStreamsGrid initialStreams={initialStreams} />
+      <PlaylistsSection initialPlaylists={initialPlaylists} />
     </>
   );
 }
