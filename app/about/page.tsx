@@ -40,17 +40,6 @@ export default async function About() {
 
   return (
     <div className="space-y-16 pb-8">
-      {/* Header section */}
-      <section className="border-l-4 border-accent pl-6">
-        {/* Page heading - serif font from global h1 styles */}
-        <h1 className="mb-4">About</h1>
-
-        {/* Tagline */}
-        <p className="text-lg text-muted">
-          Writer, streamer, and professional opinion-haver.
-        </p>
-      </section>
-
       {/* Markdown Content */}
       {content ? (
         <section>
@@ -61,19 +50,6 @@ export default async function About() {
           <p className="text-muted">About page content coming soon.</p>
         </section>
       )}
-
-      {/* CTA Section */}
-      <section>
-        <div className="border-t border-border pt-12">
-          <p className="text-body text-lg leading-relaxed">
-            Curious?{' '}
-            <Link href="/articles">
-              Check out the articles
-            </Link>{' '}
-            and see if anything catches your eye.
-          </p>
-        </div>
-      </section>
     </div>
   );
 }
