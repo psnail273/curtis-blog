@@ -101,6 +101,36 @@ export const pastStreams = pgTable('past_streams', {
   index('idx_past_streams_date').on(table.streamedAt.desc()),
 ])
 
+export const youtubePlaylists = pgTable('youtube_playlists', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  playlistId: varchar('playlist_id', { length: 255 }).notNull(),
+  title: text('title').notNull(),
+  thumbnailUrl: text('thumbnail_url').notNull(),
+  itemCount: integer('item_count').notNull().default(0),
+  position: integer('position').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique('youtube_playlists_playlist_id_unique').on(table.playlistId),
+  index('idx_youtube_playlists_position').on(table.position.asc()),
+])
+
+export const youtubePlaylistItems = pgTable('youtube_playlist_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  playlistId: varchar('playlist_id', { length: 255 }).notNull(),
+  videoId: varchar('video_id', { length: 255 }).notNull(),
+  title: text('title').notNull(),
+  thumbnailUrl: text('thumbnail_url').notNull(),
+  duration: varchar('duration', { length: 20 }).notNull(),
+  viewCount: integer('view_count').notNull().default(0),
+  publishedAt: timestamp('published_at', { withTimezone: true }).notNull(),
+  position: integer('position').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique('youtube_playlist_items_playlist_video_unique').on(table.playlistId, table.videoId),
+  index('idx_youtube_playlist_items_playlist').on(table.playlistId, table.position.asc()),
+])
+
 export const liveStatus = pgTable('live_status', {
   id: uuid('id').primaryKey().defaultRandom(),
   platform: varchar('platform', { length: 20 }).notNull(),
