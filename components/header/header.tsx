@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 import { cn } from '@/lib/utils';
+import { categoryToTag } from '@/lib/article-utils';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
 import { useAdminStatus } from '@/lib/hooks/use-admin-status';
 import { SearchTrigger } from '@/components/search/SearchTrigger';
@@ -42,12 +43,13 @@ interface HeaderProps {
 export default function Header({ categories }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const { isAnyLive } = useLiveStatus();
   const { isAdmin } = useAdminStatus();
 
-  const activeCategory = pathname === '/' ? searchParams.get('category') : null;
+  // Active category tag derived from the path: /articles/<tag> and
+  // /articles/<tag>/<slug> both resolve to <tag>.
+  const activeTag = pathname.startsWith('/articles/') ? (pathname.split('/')[2] ?? null) : null;
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -90,15 +92,15 @@ export default function Header({ categories }: HeaderProps) {
         {/* Bottom Tier: Navigation Bar (desktop only) */}
         <div className="hidden lg:flex items-center justify-center relative border-t border-border px-4 md:px-8">
           <nav className="flex items-center gap-6 py-3" aria-label="Main navigation">
-            <NavLink href="/" isActive={activeCategory === null && pathname === '/'}>
+            <NavLink href="/" isActive={pathname === '/'}>
               All
             </NavLink>
 
             {categories.map((category) => (
               <NavLink
                 key={category}
-                href={`/?category=${encodeURIComponent(category)}`}
-                isActive={activeCategory === category}
+                href={`/articles/${categoryToTag(category)}`}
+                isActive={activeTag === categoryToTag(category)}
               >
                 {category}
               </NavLink>

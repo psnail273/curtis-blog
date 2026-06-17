@@ -1,13 +1,12 @@
 'use client';
 
 import { Fragment, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { FileText } from 'lucide-react';
 import { Article } from '@/types/article';
 import { HeroMosaic } from '@/components/home/HeroMosaic';
 import { CategoryArticles } from '@/components/home/CategoryArticles';
-import { CategoryFilterView } from '@/components/home/CategoryFilterView';
 import { getCategoryStyle } from '@/lib/category-colors';
+import { categoryToTag } from '@/lib/article-utils';
 
 const CATEGORY_LIMIT = 4;
 
@@ -40,20 +39,9 @@ interface HomePageContentProps {
 }
 
 export function HomePageContent({ heroArticles, articles }: HomePageContentProps) {
-  const searchParams = useSearchParams();
-  const activeCategory = searchParams.get('category');
-
-  const displayArticles = useMemo(() => {
-    if (activeCategory) {
-      return articles.filter(a => a.category === activeCategory);
-    }
-    return articles;
-  }, [articles, activeCategory]);
-
   const groupedByCategory = useMemo(() => {
-    if (activeCategory) return null;
     const groups = new Map<string, Article[]>();
-    displayArticles.forEach(article => {
+    articles.forEach(article => {
       const existing = groups.get(article.category);
       if (existing) {
         existing.push(article);
@@ -62,39 +50,28 @@ export function HomePageContent({ heroArticles, articles }: HomePageContentProps
       }
     });
     return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b, 'en'));
-  }, [displayArticles, activeCategory]);
+  }, [articles]);
 
   // Empty state - no articles at all
   if (articles.length === 0) {
     return <EmptyState title="No articles yet" description="Check back soon for new content" />;
   }
 
-  // Category-specific view: empty category
-  if (activeCategory && displayArticles.length === 0) {
-    return (
-      <EmptyState
-        title={`No articles in ${activeCategory}`}
-        description={`Check back soon for new ${activeCategory} content`}
-      />
-    );
-  }
-
   return (
     <div className="flex flex-col gap-[var(--section-gap-mobile)] md:gap-[var(--section-gap)]">
-      {/* Hero mosaic — most recent articles in "All" view */}
-      {!activeCategory && heroArticles.length > 0 && (
+      {/* Hero mosaic — most recent articles */}
+      {heroArticles.length > 0 && (
         <HeroMosaic articles={heroArticles} />
       )}
 
       {/* Thin divider between hero and category groups */}
-      {!activeCategory && heroArticles.length > 0 && displayArticles.length > 0 && (
+      {heroArticles.length > 0 && articles.length > 0 && (
         <hr className="editorial-rule" />
       )}
 
       {/* Category groups — narrower container for text-heavy content */}
       <div className="w-full flex flex-col gap-[var(--section-gap-mobile)] md:gap-[var(--section-gap)]">
-        {/* Category groups with headers and inter-group separators (All view) */}
-        {groupedByCategory?.map(([category, catArticles], groupIndex) => (
+        {groupedByCategory.map(([category, catArticles], groupIndex) => (
           <Fragment key={category}>
             {groupIndex > 0 && <hr className="editorial-rule" />}
             <section aria-label={`${category} articles`}>
@@ -104,7 +81,7 @@ export function HomePageContent({ heroArticles, articles }: HomePageContentProps
                   articles={catArticles}
                   category={category}
                   limit={CATEGORY_LIMIT}
-                  showMoreHref={`/?category=${encodeURIComponent(category)}`}
+                  showMoreHref={`/articles/${categoryToTag(category)}`}
                   priority={groupIndex === 0 && heroArticles.length === 0}
                   showCategory={false}
                 />
@@ -112,15 +89,6 @@ export function HomePageContent({ heroArticles, articles }: HomePageContentProps
             </section>
           </Fragment>
         ))}
-
-        {/* Category filter view — hero + 4-column grid */}
-        {activeCategory && (
-          <CategoryFilterView
-            articles={displayArticles}
-            category={activeCategory}
-            priority={heroArticles.length === 0}
-          />
-        )}
       </div>
     </div>
   );
