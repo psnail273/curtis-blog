@@ -60,11 +60,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       )}
 
       <Link
-        href="/"
+        href={`/articles/${tag}`}
         className="inline-flex items-center gap-2 text-muted hover:text-accent mb-8 text-sm transition-all duration-200 hover:translate-x-[-4px]"
       >
         <ArrowLeft size={16} aria-hidden="true" />
-        Back to articles
+        Back to {article.category}
       </Link>
 
       {/* Cover Image — fills container width, natural aspect ratio */}
