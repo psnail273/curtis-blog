@@ -2,45 +2,22 @@ export const dynamic = 'force-dynamic';
 
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
-import { getDb } from '@/lib/db';
-import type { ArticleRow } from '@/lib/article-utils';
-import { isAdminAuthenticated } from '@/lib/admin-auth';
+import { articleHref } from '@/lib/article-utils';
 import { ArticleByline } from '@/components/articles/ArticleByline';
 import { ArticleContent } from '@/components/articles/ArticleContent';
 import { CommentsSection } from '@/components/comments/CommentsSection';
+import { resolveArticleOr404 } from './article-data';
 
 interface ArticlePageProps {
-  params: Promise<{ slug: string }>;
-}
-
-async function getArticleBySlug(slug: string): Promise<ArticleRow | null> {
-  try {
-    const sql = getDb();
-    const rows = await sql`
-      SELECT * FROM articles WHERE slug = ${slug}
-    ` as ArticleRow[];
-    return rows.length > 0 ? rows[0] : null;
-  } catch (error) {
-    console.error('Error fetching article:', error);
-    return null;
-  }
+  params: Promise<{ tag: string; slug: string }>;
 }
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-
-  if (!article) {
-    return {
-      title: 'Article Not Found',
-      description: 'The requested article could not be found.',
-      robots: { index: false, follow: true },
-    };
-  }
+  const { tag, slug } = await params;
+  const article = await resolveArticleOr404(tag, slug);
 
   const description = article.excerpt || article.content.substring(0, 160);
 
@@ -51,7 +28,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     openGraph: {
       title: article.title,
       description,
-      url: `/articles/${article.slug}`,
+      url: articleHref(article),
       type: 'article',
       publishedTime: article.published_at ?? undefined,
       authors: [article.author],
@@ -66,21 +43,10 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const { tag, slug } = await params;
+  const article = await resolveArticleOr404(tag, slug);
 
-  if (!article) {
-    notFound();
-  }
-
-  // Draft articles require admin authentication
   const isDraft = article.status !== 'published';
-  if (isDraft) {
-    const isAdmin = await isAdminAuthenticated();
-    if (!isAdmin) {
-      notFound();
-    }
-  }
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -167,17 +133,4 @@ function CommentsSkeleton() {
       </div>
     </div>
   );
-}
-
-export async function generateStaticParams() {
-  try {
-    const sql = getDb();
-    const rows = await sql`
-      SELECT slug FROM articles WHERE status = 'published'
-    ` as { slug: string }[];
-    return rows.map((row) => ({ slug: row.slug }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
 }

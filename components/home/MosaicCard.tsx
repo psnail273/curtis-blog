@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Article } from '@/types/article';
 import { cn } from '@/lib/utils';
 import { getCategoryStyle } from '@/lib/category-colors';
+import { articleHref } from '@/lib/article-utils';
 import { formatDateLong } from '@/lib/format-utils';
 
 interface MosaicCardProps {
@@ -17,7 +18,7 @@ interface MosaicCardProps {
 export function MosaicCard({ article, size, priority = false, showCategory = true, featured = false, className }: MosaicCardProps) {
   return (
     <Link
-      href={`/articles/${article.slug}`}
+      href={articleHref(article)}
       aria-label={`Read article: ${article.title}`}
       className={cn("block h-full group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring", className)}
     >

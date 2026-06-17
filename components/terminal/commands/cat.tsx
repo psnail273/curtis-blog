@@ -6,6 +6,7 @@ import { resolveFileType, formatFileSize, resolvePath, pathToArg } from '../util
 import type { CommandContext } from './index';
 import type { FileRecord } from '@/types/file';
 import type { Article } from '@/types/article';
+import { articleHref } from '@/lib/article-utils';
 
 /**
  * Render file metadata in terminal format.
@@ -176,7 +177,7 @@ function CatArticlesAsync() {
                 </div>
                 <p className="text-body mt-2">{article.excerpt}</p>
                 <Link
-                  href={`/articles/${article.slug}`}
+                  href={articleHref(article)}
                   className="text-accent hover:underline text-sm inline-block mt-1"
                 >
                   Read full article &rarr;
@@ -229,10 +230,10 @@ function CatArticleAsync({ slug }: { slug: string }) {
           </div>
           <p className="text-body">{article.excerpt}</p>
           <div className="text-muted mt-4">
-            [Content preview truncated. Read full article at /articles/{article.slug}]
+            [Content preview truncated. Read full article at {articleHref(article)}]
           </div>
           <Link
-            href={`/articles/${article.slug}`}
+            href={articleHref(article)}
             className="text-accent hover:underline inline-block mt-2"
           >
             Read full article &rarr;
