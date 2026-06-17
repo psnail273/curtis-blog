@@ -18,6 +18,18 @@ export interface PastStream {
 }
 
 /**
+ * A YouTube playlist with its videos (videos use the PastStream shape so
+ * StreamCard can render them unchanged).
+ */
+export interface YouTubePlaylist {
+  id: string;
+  title: string;
+  thumbnailUrl: string;
+  itemCount: number;
+  items: PastStream[];
+}
+
+/**
  * Parse ISO 8601 duration (YouTube format) to human-readable format.
  * Example: PT3H21M5S → "3:21:05", PT45M → "45:00", PT30S → "0:30"
  */

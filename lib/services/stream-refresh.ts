@@ -1,11 +1,21 @@
 import { getDb } from '@/lib/db';
 import { checkStreamStatus as checkTwitchStreamStatus } from './twitch';
-import { checkStreamStatus as checkYouTubeStreamStatus, fetchPastStreams as fetchYouTubePastStreams } from './youtube';
+import {
+  checkStreamStatus as checkYouTubeStreamStatus,
+  fetchPastStreams as fetchYouTubePastStreams,
+  fetchPlaylists as fetchYouTubePlaylists,
+  fetchPlaylistItems as fetchYouTubePlaylistItems,
+} from './youtube';
 import { fetchPastStreams as fetchTwitchPastStreams } from './twitch';
 
 // In-memory flags to prevent concurrent refreshes (thundering herd protection)
 let liveRefreshing = false;
 let pastStreamsRefreshing = false;
+let playlistsRefreshing = false;
+
+// Quota caps for the YouTube playlist sync
+const MAX_PLAYLISTS = 20;
+const MAX_ITEMS_PER_PLAYLIST = 25;
 
 export async function refreshLiveStatus(): Promise<void> {
   if (liveRefreshing) return;
@@ -86,5 +96,52 @@ export async function refreshPastStreams(): Promise<void> {
     console.error('Failed to refresh past streams:', error);
   } finally {
     pastStreamsRefreshing = false;
+  }
+}
+
+export async function refreshPlaylists(): Promise<void> {
+  if (playlistsRefreshing) return;
+
+  const channelId = process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID;
+  if (!channelId || !process.env.YOUTUBE_API_KEY) return;
+
+  playlistsRefreshing = true;
+
+  try {
+    const sql = getDb();
+
+    const playlists = await fetchYouTubePlaylists(channelId);
+
+    for (const playlist of playlists.slice(0, MAX_PLAYLISTS)) {
+      let items: Awaited<ReturnType<typeof fetchYouTubePlaylistItems>> = [];
+      try {
+        items = await fetchYouTubePlaylistItems(playlist.id, MAX_ITEMS_PER_PLAYLIST);
+      } catch (error) {
+        console.error(`Failed to fetch items for playlist ${playlist.id}:`, error);
+        continue;
+      }
+
+      await sql`
+        INSERT INTO youtube_playlists (playlist_id, title, thumbnail_url, item_count, position, updated_at)
+        VALUES (${playlist.id}, ${playlist.title}, ${playlist.thumbnailUrl}, ${playlist.itemCount}, ${playlist.position}, NOW())
+        ON CONFLICT (playlist_id)
+        DO UPDATE SET title = ${playlist.title}, thumbnail_url = ${playlist.thumbnailUrl}, item_count = ${playlist.itemCount}, position = ${playlist.position}, updated_at = NOW()
+      `;
+
+      let position = 0;
+      for (const item of items) {
+        await sql`
+          INSERT INTO youtube_playlist_items (playlist_id, video_id, title, thumbnail_url, duration, view_count, published_at, position)
+          VALUES (${playlist.id}, ${item.id}, ${item.title}, ${item.thumbnailUrl}, ${item.duration}, ${item.viewCount}, ${item.createdAt}, ${position})
+          ON CONFLICT (playlist_id, video_id)
+          DO UPDATE SET title = ${item.title}, thumbnail_url = ${item.thumbnailUrl}, duration = ${item.duration}, view_count = ${item.viewCount}, position = ${position}
+        `;
+        position++;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to refresh playlists:', error);
+  } finally {
+    playlistsRefreshing = false;
   }
 }
