@@ -91,7 +91,7 @@ export default function Header({ categories }: HeaderProps) {
 
         {/* Bottom Tier: Navigation Bar (desktop only) */}
         <div className="hidden lg:flex items-center justify-center relative border-t border-border px-4 md:px-8">
-          <nav className="flex items-center gap-6 py-3" aria-label="Main navigation">
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 py-3" aria-label="Main navigation">
             <NavLink href="/" isActive={pathname === '/'}>
               All
             </NavLink>

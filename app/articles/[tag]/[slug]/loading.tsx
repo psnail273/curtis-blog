@@ -1,6 +1,6 @@
 export default function ArticleLoading() {
   return (
-    <div className="max-w-3xl mx-auto animate-pulse">
+    <div className="animate-pulse">
       {/* Back link */}
       <div className="h-4 w-28 bg-border rounded mb-8" />
 

@@ -33,6 +33,13 @@ export function ArticleContent({ content }: ArticleContentProps) {
               </span>
             );
           },
+          // Wrap tables so wide ones scroll horizontally within the column
+          // instead of overflowing the article body on narrow screens.
+          table: ({ children }) => (
+            <div className="table-scroll">
+              <table>{children}</table>
+            </div>
+          ),
           // First paragraph gets drop cap via CSS
           p: ({ children, node }) => {
             const parent = node?.position;

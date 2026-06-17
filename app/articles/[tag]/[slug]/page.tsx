@@ -49,7 +49,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const isDraft = article.status !== 'published';
 
   return (
-    <article className="max-w-3xl mx-auto">
+    <article>
       {/* Draft preview banner — admin only */}
       {isDraft && (
         <div className="mb-6">
