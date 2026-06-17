@@ -9,14 +9,7 @@ export const metadata: Metadata = {
   description: 'A personal blog by Curtis Israel covering politics, gaming, education, tech, and more.',
 };
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ category?: string }>;
-}) {
-  // Await searchParams to mark route as dynamic (category filter is applied client-side
-  // via useSearchParams; without this await, Next.js would cache the page)
-  await searchParams;
+export default async function Home() {
   const sql = getDb();
   const isAdmin = await isAdminAuthenticated();
 

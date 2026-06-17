@@ -474,6 +474,8 @@
   font-size: 0.9375rem;
   line-height: 1.7;
   color: var(--text-body);
+  /* Break long unbreakable strings (e.g. URLs) so they never overflow the column. */
+  overflow-wrap: break-word;
 }
 
 /* Article body prose — serif font for editorial reading experience */
@@ -586,10 +588,27 @@
   font-style: italic;
 }
 
+/* Scroll container for wide tables — keeps them inside the article column */
+:is(.prose-content, .markdown-preview, .docx-preview) .table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin-bottom: 0.75em;
+  -webkit-overflow-scrolling: touch;
+}
+
 :is(.prose-content, .markdown-preview, .docx-preview) table {
   border-collapse: collapse;
   width: 100%;
   margin-bottom: 0.75em;
+}
+
+/* Inside the scroll wrapper, let the table take its natural width so wide
+   tables scroll horizontally rather than cramming/wrapping into the column. */
+:is(.prose-content, .markdown-preview, .docx-preview) .table-scroll > table {
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  margin-bottom: 0;
 }
 
 :is(.prose-content, .markdown-preview, .docx-preview) :is(th, td) {

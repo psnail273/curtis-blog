@@ -21,6 +21,21 @@ export interface ArticleRow {
 }
 
 /**
+ * Converts a category to its URL tag segment (e.g. "Politics" → "politics").
+ */
+export function categoryToTag(category: string): string {
+  return category.toLowerCase().trim().replace(/\s+/g, '-');
+}
+
+/**
+ * Canonical path for an article.
+ * Accepts either an ArticleRow or an Article — both expose `category` and `slug`.
+ */
+export function articleHref(a: { category: string; slug: string }): string {
+  return `/articles/${categoryToTag(a.category)}/${a.slug}`;
+}
+
+/**
  * Converts a database ArticleRow to the application Article type.
  * Transforms snake_case column names to camelCase properties.
  */

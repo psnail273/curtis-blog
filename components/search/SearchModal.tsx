@@ -7,6 +7,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useDebounce } from '@/hooks/useDebounce';
 import { SearchInput } from './SearchInput';
 import { SearchResults } from './SearchResults';
+import { articleHref } from '@/lib/article-utils';
 import type { Article } from '@/types/article';
 import type { FileRecord } from '@/types/file';
 import type { SearchResult, PastStream } from '@/types/search';
@@ -161,7 +162,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
   const navigateToResult = useCallback(
     (result: SearchResult) => {
       if (result.type === 'article') {
-        router.push(`/articles/${result.data.slug}`);
+        router.push(articleHref(result.data));
       } else if (result.type === 'stream') {
         window.open(result.data.url, '_blank', 'noopener,noreferrer');
       } else if (result.type === 'file') {

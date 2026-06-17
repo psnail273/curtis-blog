@@ -22,6 +22,13 @@
       "when": 1773204957234,
       "tag": "0002_mysterious_warpath",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781728632807,
+      "tag": "0003_vengeful_thor",
+      "breakpoints": true
     }
   ]
 }

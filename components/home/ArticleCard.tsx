@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Article } from '@/types/article';
 import { cn } from '@/lib/utils';
 import { getCategoryStyle } from '@/lib/category-colors';
+import { articleHref } from '@/lib/article-utils';
 import { formatDateLong } from '@/lib/format-utils';
 
 interface ArticleCardProps {
@@ -13,7 +14,7 @@ interface ArticleCardProps {
 export function ArticleCard({ article, priority = false }: ArticleCardProps) {
   return (
     <Link
-      href={`/articles/${article.slug}`}
+      href={articleHref(article)}
       aria-label={`Read article: ${article.title}`}
       className="block group h-fit md:h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >

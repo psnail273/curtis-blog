@@ -2,8 +2,9 @@
 
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { categoryToTag } from '@/lib/article-utils';
 import { useLiveStatus } from '@/contexts/LiveStatusContext';
 import { SearchTrigger } from '@/components/search/SearchTrigger';
 
@@ -18,11 +19,12 @@ interface MobileNavProps {
 
 export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categories, isAdmin }: MobileNavProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const panelRef = useRef<HTMLDivElement>(null);
   const { isAnyLive } = useLiveStatus();
 
-  const activeCategory = pathname === '/' ? searchParams.get('category') : null;
+  // Active category tag derived from the path: /articles/<tag> and
+  // /articles/<tag>/<slug> both resolve to <tag>.
+  const activeTag = pathname.startsWith('/articles/') ? (pathname.split('/')[2] ?? null) : null;
 
   // Focus trap: handle Tab/Shift+Tab to cycle through panel elements only
   useEffect(() => {
@@ -183,11 +185,11 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
               'transition-colors duration-200',
               'min-h-[44px] flex items-center',
               'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              activeCategory === null && pathname === '/'
+              pathname === '/'
                 ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                 : 'text-foreground hover:bg-accent/10 hover:text-accent'
             )}
-            aria-current={activeCategory === null && pathname === '/' ? 'page' : undefined}
+            aria-current={pathname === '/' ? 'page' : undefined}
           >
             All
           </Link>
@@ -196,7 +198,7 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
           {categories.map((category) => (
             <Link
               key={category}
-              href={`/?category=${encodeURIComponent(category)}`}
+              href={`/articles/${categoryToTag(category)}`}
               onClick={onClose}
               className={cn(
                 'block w-full text-left px-4 py-3 rounded-lg',
@@ -204,11 +206,11 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
                 'transition-colors duration-200',
                 'min-h-[44px] flex items-center',
                 'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-                activeCategory === category
+                activeTag === categoryToTag(category)
                   ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
                   : 'text-foreground hover:bg-accent/10 hover:text-accent'
               )}
-              aria-current={activeCategory === category ? 'page' : undefined}
+              aria-current={activeTag === categoryToTag(category) ? 'page' : undefined}
             >
               {category}
             </Link>
@@ -284,52 +286,37 @@ export default function MobileNav({ isOpen, onClose, hamburgerButtonRef, categor
           </Link>
         </nav>
 
-        {/* Divider */}
-        <div className="border-t border-border" />
+        {/* More links section — admin only */}
+        {isAdmin && (
+          <>
+            {/* Divider */}
+            <div className="border-t border-border" />
 
-        {/* More links section */}
-        <nav className="flex flex-col gap-2" aria-label="More">
-          <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
-            More
-          </span>
+            <nav className="flex flex-col gap-2" aria-label="More">
+              <span className="text-xs font-medium text-secondary uppercase tracking-wide px-4">
+                More
+              </span>
 
-          <Link
-            href="/support"
-            onClick={onClose}
-            className={cn(
-              'block w-full text-left px-4 py-2 rounded-lg',
-              'text-base font-sans',
-              'transition-colors duration-200',
-              'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-              'min-h-[44px] flex items-center',
-              pathname === '/support'
-                ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
-                : 'text-muted hover:bg-accent/10 hover:text-accent'
-            )}
-            aria-current={pathname === '/support' ? 'page' : undefined}
-          >
-            Support
-          </Link>
-          {isAdmin && (
-            <Link
-              href="/admin"
-              onClick={onClose}
-              className={cn(
-                'block w-full text-left px-4 py-2 rounded-lg',
-                'text-base font-sans',
-                'transition-colors duration-200',
-                'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
-                'min-h-[44px] flex items-center',
-                pathname === '/admin'
-                  ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
-                  : 'text-muted hover:bg-accent/10 hover:text-accent'
-              )}
-              aria-current={pathname === '/admin' ? 'page' : undefined}
-            >
-              Admin
-            </Link>
-          )}
-        </nav>
+              <Link
+                href="/admin"
+                onClick={onClose}
+                className={cn(
+                  'block w-full text-left px-4 py-2 rounded-lg',
+                  'text-base font-sans',
+                  'transition-colors duration-200',
+                  'focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+                  'min-h-[44px] flex items-center',
+                  pathname === '/admin'
+                    ? 'text-accent font-bold border-l-4 border-accent bg-accent/5'
+                    : 'text-muted hover:bg-accent/10 hover:text-accent'
+                )}
+                aria-current={pathname === '/admin' ? 'page' : undefined}
+              >
+                Admin
+              </Link>
+            </nav>
+          </>
+        )}
       </div>
     </>
   );

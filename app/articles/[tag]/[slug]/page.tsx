@@ -2,45 +2,22 @@ export const dynamic = 'force-dynamic';
 
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
-import { getDb } from '@/lib/db';
-import type { ArticleRow } from '@/lib/article-utils';
-import { isAdminAuthenticated } from '@/lib/admin-auth';
-import { formatDateLong } from '@/lib/format-utils';
+import { articleHref } from '@/lib/article-utils';
+import { ArticleByline } from '@/components/articles/ArticleByline';
 import { ArticleContent } from '@/components/articles/ArticleContent';
 import { CommentsSection } from '@/components/comments/CommentsSection';
+import { resolveArticleOr404 } from './article-data';
 
 interface ArticlePageProps {
-  params: Promise<{ slug: string }>;
-}
-
-async function getArticleBySlug(slug: string): Promise<ArticleRow | null> {
-  try {
-    const sql = getDb();
-    const rows = await sql`
-      SELECT * FROM articles WHERE slug = ${slug}
-    ` as ArticleRow[];
-    return rows.length > 0 ? rows[0] : null;
-  } catch (error) {
-    console.error('Error fetching article:', error);
-    return null;
-  }
+  params: Promise<{ tag: string; slug: string }>;
 }
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-
-  if (!article) {
-    return {
-      title: 'Article Not Found',
-      description: 'The requested article could not be found.',
-      robots: { index: false, follow: true },
-    };
-  }
+  const { tag, slug } = await params;
+  const article = await resolveArticleOr404(tag, slug);
 
   const description = article.excerpt || article.content.substring(0, 160);
 
@@ -51,7 +28,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     openGraph: {
       title: article.title,
       description,
-      url: `/articles/${article.slug}`,
+      url: articleHref(article),
       type: 'article',
       publishedTime: article.published_at ?? undefined,
       authors: [article.author],
@@ -66,24 +43,13 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const { tag, slug } = await params;
+  const article = await resolveArticleOr404(tag, slug);
 
-  if (!article) {
-    notFound();
-  }
-
-  // Draft articles require admin authentication
   const isDraft = article.status !== 'published';
-  if (isDraft) {
-    const isAdmin = await isAdminAuthenticated();
-    if (!isAdmin) {
-      notFound();
-    }
-  }
 
   return (
-    <article className="max-w-3xl mx-auto">
+    <article>
       {/* Draft preview banner — admin only */}
       {isDraft && (
         <div className="mb-6">
@@ -94,11 +60,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       )}
 
       <Link
-        href="/"
+        href={`/articles/${tag}`}
         className="inline-flex items-center gap-2 text-muted hover:text-accent mb-8 text-sm transition-all duration-200 hover:translate-x-[-4px]"
       >
         <ArrowLeft size={16} aria-hidden="true" />
-        Back to articles
+        Back to {article.category}
       </Link>
 
       {/* Cover Image — fills container width, natural aspect ratio */}
@@ -127,21 +93,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </p>
         )}
 
-        {/* Byline — editorial style */}
-        <div className="flex items-center gap-3 pt-5 border-t border-border">
-          <div className="flex flex-col">
-            <span className="font-sans text-sm font-semibold text-foreground tracking-wide">
-              By {article.author}
-            </span>
-            <div className="flex items-center gap-2 text-caption text-xs mt-0.5">
-              <time dateTime={article.published_at ?? undefined}>
-                {formatDateLong(article.published_at)}
-              </time>
-              <span aria-hidden="true">&middot;</span>
-              <span>{article.read_time} min read</span>
-            </div>
-          </div>
-        </div>
+        {/* Byline — editorial style, with share action */}
+        <ArticleByline
+          author={article.author}
+          publishedAt={article.published_at}
+          readTime={article.read_time}
+        />
       </header>
 
       {/* Article body — Markdown rendered */}
@@ -176,17 +133,4 @@ function CommentsSkeleton() {
       </div>
     </div>
   );
-}
-
-export async function generateStaticParams() {
-  try {
-    const sql = getDb();
-    const rows = await sql`
-      SELECT slug FROM articles WHERE status = 'published'
-    ` as { slug: string }[];
-    return rows.map((row) => ({ slug: row.slug }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
 }
